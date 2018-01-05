@@ -14,7 +14,7 @@ import org.restlet.util.Series;
 
 /**
  *
- * @author Mirko Stancic, Dhimahi
+ * @author Cic
  */
 public class SecureComponent extends Component {
 

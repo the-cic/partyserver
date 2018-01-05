@@ -11,7 +11,7 @@ import org.restlet.resource.ServerResource;
 
 /**
  *
- * @author Mirko Stancic, Dhimahi
+ * @author Cic
  */
 public class InfoResource extends ServerResource {
 

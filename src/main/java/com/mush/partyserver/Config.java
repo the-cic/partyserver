@@ -19,7 +19,7 @@ import org.apache.logging.log4j.Logger;
 
 /**
  *
- * @author Mirko Stancic, Dhimahi
+ * @author Cic
  */
 public class Config {
 

@@ -14,7 +14,7 @@ import org.java_websocket.server.WebSocketServer;
 
 /**
  *
- * @author Mirko Stancic, Dhimahi
+ * @author Cic
  */
 public class SocketServer extends WebSocketServer {
 

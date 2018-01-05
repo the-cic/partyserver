@@ -14,7 +14,7 @@ import org.restlet.service.CorsService;
 
 /**
  *
- * @author Mirko Stancic, Dhimahi
+ * @author Cic
  */
 public class ApiApplication extends Application {
 

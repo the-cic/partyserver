@@ -15,7 +15,7 @@ import websocket.SocketServer;
 
 /**
  *
- * @author Mirko Stancic, Dhimahi
+ * @author Cic
  */
 public class Main {
 
