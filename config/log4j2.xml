@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %msg%n"/>
+        </Console>
+
+        <RollingFile name="RollingFile"
+                     fileName="./log/media-upload-tool.log"
+                     filePattern="./log/log-%d{MM-dd-yyyy}-%i.log.gz">
+
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %msg - %logger{36}%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>
