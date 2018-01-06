@@ -8,9 +8,10 @@ package com.mush.partyserver;
 import com.mush.partyserver.restlet.ApiApplication;
 import com.mush.partyserver.restlet.SecureComponent;
 import com.mush.partyserver.rooms.GuestHandler;
+import com.mush.partyserver.websocket.SecureRoomServer;
 import org.restlet.Component;
 import org.restlet.resource.ResourceException;
-import com.mush.partyserver.websocket.SocketServer;
+import com.mush.partyserver.websocket.RoomServer;
 
 /**
  *
@@ -21,7 +22,7 @@ public class Main {
     private static Main instance;
 
     public final Config config;
-    private SocketServer socketServer;
+    private RoomServer socketServer;
 
     private Main(String[] args) {
         config = new Config();
@@ -59,7 +60,8 @@ public class Main {
 
     private void startSocketApi(int port) {
         GuestHandler handler = new GuestHandler(config);
-        socketServer = new SocketServer(port, handler);
+        socketServer = new SecureRoomServer(port, handler);
+        ((SecureRoomServer)socketServer).makeSecure(config);
         socketServer.start();
     }
 

@@ -35,12 +35,13 @@ public class Config {
     private final Logger logger;
 
     private int httpPort;
-    private int socketPort;
     private int httpsPort;
+    private int socketPort;
+    private boolean socketSsl;
     private String keyStorePath;
     private String keyStorePassword;
     private String keyPassword;
-    
+
     private HashMap<String, String> userTokens;
     private HashMap<String, String> tokenUsers;
 
@@ -74,6 +75,18 @@ public class Config {
         return keyStorePath;
     }
 
+    public HashMap<String, String> getUserTokens() {
+        return userTokens;
+    }
+
+    public HashMap<String, String> getTokenUsers() {
+        return tokenUsers;
+    }
+
+    public boolean getSocketSsl() {
+        return socketSsl;
+    }
+
     private Logger setupLog4j() {
         String log4jConfigFile = Paths.get(CONFIG_DIR, LOG_CONFIG_FILE).toString();
 
@@ -102,17 +115,18 @@ public class Config {
 
         SubnodeConfiguration socket = ini.getSection("websocket");
         socketPort = socket.getInt("port");
-        
+        socketSsl = socket.getBoolean("ssl");
+
         userTokens = new HashMap<>();
         tokenUsers = new HashMap<>();
         SubnodeConfiguration users = ini.getSection("users");
-        Iterator<String> userKeys= users.getKeys();
+        Iterator<String> userKeys = users.getKeys();
         while (userKeys.hasNext()) {
             String key = userKeys.next();
             userTokens.put(key, users.getString(key));
         }
         for (Map.Entry<String, String> e : userTokens.entrySet()) {
-            getTokenUsers().put(e.getValue(), e.getKey());
+            tokenUsers.put(e.getValue(), e.getKey());
         }
     }
 
@@ -122,9 +136,9 @@ public class Config {
 
         FileBasedConfigurationBuilder<INIConfiguration> builder
                 = new FileBasedConfigurationBuilder<>(INIConfiguration.class)
-                .configure(new Parameters().properties()
-                        .setFileName(configFilePath)
-                );
+                        .configure(new Parameters().properties()
+                                .setFileName(configFilePath)
+                        );
 
         try {
             return builder.getConfiguration();
@@ -134,14 +148,6 @@ public class Config {
         }
 
         return null;
-    }
-
-    public HashMap<String, String> getUserTokens() {
-        return userTokens;
-    }
-
-    public HashMap<String, String> getTokenUsers() {
-        return tokenUsers;
     }
 
 }

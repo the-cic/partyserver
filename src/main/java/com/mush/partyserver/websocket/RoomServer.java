@@ -19,14 +19,14 @@ import org.java_websocket.server.WebSocketServer;
  *
  * @author Cic
  */
-public class SocketServer extends WebSocketServer {
+public class RoomServer extends WebSocketServer {
 
     private long connectionCount = 0;
-    private Logger logger;
+    protected Logger logger;
     private GuestHandler handler;
     private HashMap<WebSocket, Guest> guests;
 
-    public SocketServer(int port, GuestHandler handler0) {
+    public RoomServer(int port, GuestHandler handler0) {
         this(new InetSocketAddress(port));
         logger = LogManager.getLogger(this.getClass());
         logger.info("Created WebSocketServer on port {}", this.getPort());
@@ -34,7 +34,7 @@ public class SocketServer extends WebSocketServer {
         handler = handler0;
     }
 
-    public SocketServer(InetSocketAddress address) {
+    public RoomServer(InetSocketAddress address) {
         super(address);
     }
 
