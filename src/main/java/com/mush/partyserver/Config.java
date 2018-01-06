@@ -6,6 +6,9 @@
 package com.mush.partyserver;
 
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import org.apache.commons.configuration2.INIConfiguration;
@@ -37,6 +40,9 @@ public class Config {
     private String keyStorePath;
     private String keyStorePassword;
     private String keyPassword;
+    
+    private HashMap<String, String> userTokens;
+    private HashMap<String, String> tokenUsers;
 
     public Config() {
         logger = setupLog4j();
@@ -54,10 +60,6 @@ public class Config {
 
     public int getHttpsPort() {
         return httpsPort;
-    }
-
-    public void setHttpsPort(int httpsPort) {
-        this.httpsPort = httpsPort;
     }
 
     public String getKeyPassword() {
@@ -100,6 +102,18 @@ public class Config {
 
         SubnodeConfiguration socket = ini.getSection("websocket");
         socketPort = socket.getInt("port");
+        
+        userTokens = new HashMap<>();
+        tokenUsers = new HashMap<>();
+        SubnodeConfiguration users = ini.getSection("users");
+        Iterator<String> userKeys= users.getKeys();
+        while (userKeys.hasNext()) {
+            String key = userKeys.next();
+            userTokens.put(key, users.getString(key));
+        }
+        for (Map.Entry<String, String> e : userTokens.entrySet()) {
+            getTokenUsers().put(e.getValue(), e.getKey());
+        }
     }
 
     private INIConfiguration readConfig(String configFile) {
@@ -120,6 +134,14 @@ public class Config {
         }
 
         return null;
+    }
+
+    public HashMap<String, String> getUserTokens() {
+        return userTokens;
+    }
+
+    public HashMap<String, String> getTokenUsers() {
+        return tokenUsers;
     }
 
 }

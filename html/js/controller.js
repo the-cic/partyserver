@@ -5,18 +5,20 @@ angular.module('logApp')
             var self = this;
 
             DataService.setListener(self);
-            $scope.connectionStatus = "";
+            $scope.connectionStatus = "Disconnected";
             $scope.updateCount = 0;
             $scope.subNavigation = 0;
             $scope.roomInput = "room1";
             $scope.nameInput = "name";
             $scope.masterInput = false;
+            $scope.tokenInput = "";
             $scope.log = "";
 
             $scope.onClickConnect = function () {
                 self.code = $scope.roomInput;
                 self.name = $scope.nameInput;
                 self.master = $scope.masterInput;
+                self.token = $scope.tokenInput;
                 if (DataService.connect()) {
                     $scope.connectionStatus = "Connecting...";
                 }
@@ -25,7 +27,8 @@ angular.module('logApp')
             $scope.onClickSend = function () {
                 var message = {
                     target : self.master ? "*" : "",
-                    content : {
+                    subject : "hello",
+                    body : {
                         text : "hello I am " + self.name
                     }
                 };
@@ -42,7 +45,7 @@ angular.module('logApp')
                 };
                 if (self.master) {
                     message.room = null;
-                    message.token = "token";
+                    message.token = self.token;
                 }
                 DataService.send(JSON.stringify(message));
             };

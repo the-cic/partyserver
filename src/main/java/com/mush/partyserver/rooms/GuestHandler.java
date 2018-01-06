@@ -8,6 +8,7 @@ package com.mush.partyserver.rooms;
 import com.mush.partyserver.rooms.exceptions.RoomsException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mush.partyserver.Config;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,12 +23,12 @@ public class GuestHandler {
 
     private Logger logger;
     private Rooms rooms;
+    private Config config;
 
-    public GuestHandler() {
+    public GuestHandler(Config config0) {
         logger = LogManager.getLogger(this.getClass());
         rooms = new Rooms();
-
-//        rooms.createNewRoom();
+        config = config0;
     }
 
     public void onNewGuest(Guest guest) {
@@ -76,6 +77,14 @@ public class GuestHandler {
         }
     }
 
+    /**
+     * Login a guest to an existing room, or create a new room for a room owner
+     * 
+     * @param message
+     * @param guest
+     * @throws IOException
+     * @throws RoomsException 
+     */
     private void login(String message, Guest guest) throws IOException, RoomsException {
         ObjectMapper mapper = new ObjectMapper();
 
@@ -84,7 +93,7 @@ public class GuestHandler {
         if (loginMessage.token != null) {
             verifyToken(loginMessage.token);
 
-            String roomName = rooms.createNewRoom();
+            String roomName = rooms.createNewRoom(loginMessage.token);
 
             guest.login(loginMessage.login, roomName, true);
 
@@ -106,31 +115,38 @@ public class GuestHandler {
 
     private void sendNewRoom(Guest owner) {
         HashMap<String, Object> content = new HashMap<>();
-        content.put("room", owner.getRoom());
-        sendMessageToOwner(owner, content);
+        content.put("name", owner.getRoom());
+        sendMessageToOwner(owner, "roomCreated", content);
     }
 
     private void sendGuestConnected(Guest owner, Guest guest) {
         HashMap<String, Object> content = new HashMap<>();
-        content.put("connected", guest.getLoginName());
-        sendMessageToOwner(owner, content);
+        content.put("name", guest.getLoginName());
+        sendMessageToOwner(owner, "userConnected", content);
     }
 
     private void sendGuestDisonnected(Guest owner, Guest guest) {
         HashMap<String, Object> content = new HashMap<>();
-        content.put("disconnected", guest.getLoginName());
-        sendMessageToOwner(owner, content);
+        content.put("name", guest.getLoginName());
+        sendMessageToOwner(owner, "userDisconnected", content);
     }
 
-    private void sendMessageToOwner(Guest owner, HashMap<String, Object> content) {
-        Message message = new Message();
+    private void sendMessageToOwner(Guest owner, String subject, HashMap<String, Object> body) {
+        ContentMessage message = new ContentMessage();
         message.target = "";
-        message.content = content;
+        message.subject = subject;
+        message.body = body;
         owner.send(jsonForObject(message));
     }
 
-    private void verifyToken(String token) {
-        // TODO
+    private void verifyToken(String token) throws RoomsException {
+        HashMap<String, String> tokenUsers = config.getTokenUsers();
+        if (tokenUsers.containsKey(token)) {
+            logger.info("Token is valid: {}, belongs to {}", token, tokenUsers.get(token));
+        } else {
+            logger.info("Invalid token: {}", token);
+            throw new RoomsException("Invalid token");
+        }
     }
 
     private void checkGuestIsOwner(Guest guest) throws RoomsException {
@@ -149,10 +165,17 @@ public class GuestHandler {
         }
     }
 
+    /**
+     * Route the message to the proper recipient(s)
+     * @param messageString
+     * @param guest
+     * @throws IOException
+     * @throws RoomsException 
+     */
     private void processMessage(String messageString, Guest guest) throws IOException, RoomsException {
         ObjectMapper mapper = new ObjectMapper();
 
-        Message message = mapper.readValue(messageString, Message.class);
+        ContentMessage message = mapper.readValue(messageString, ContentMessage.class);
 
         switch (message.target) {
             case "":

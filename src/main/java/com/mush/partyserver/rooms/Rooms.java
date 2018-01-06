@@ -25,24 +25,30 @@ public class Rooms {
      */
     private HashMap<String, HashMap<String, Guest>> rooms;
     private HashMap<String, Guest> roomOwners;
-//    private int count = 0;
+    private HashMap<String, String> roomTokens;
     private Logger logger;
 
     public Rooms() {
         logger = LogManager.getLogger(this.getClass());
         rooms = new HashMap<>();
         roomOwners = new HashMap<>();
+        roomTokens = new HashMap<>();
     }
 
     /**
      * Create new room and return its name
      *
+     * @param token
      * @return
      * @throws com.mush.partyserver.rooms.exceptions.RoomsException
      */
-    public String createNewRoom() throws RoomsException {
+    public String createNewRoom(String token) throws RoomsException {
+        if (roomTokens.containsValue(token)) {
+            throw new RoomsException("Room for this token is in use");
+        }
         String roomName = newRoomName();
         rooms.put(roomName, new HashMap<>());
+        roomTokens.put(roomName, token);
         logger.info("New room created: {}", roomName);
         return roomName;
     }
@@ -89,14 +95,15 @@ public class Rooms {
 
     public void removeGuest(Guest guest) throws RoomsException {
         if (!roomExists(guest.getRoom())) {
+            guest.clearRoom();
             throw new RoomDoesNotExistException(guest.getRoom());
         }
         HashMap<String, Guest> room = rooms.get(guest.getRoom());
         Guest guestInRoom = room.get(guest.getLoginName());
         if (guest.equals(guestInRoom)) {
             room.remove(guest.getLoginName());
-            guest.clearRoom();
             logger.info("Guest {} removed from room {}", guest, guest.getRoom());
+            guest.clearRoom();
         }
     }
 
@@ -128,6 +135,7 @@ public class Rooms {
         }
         room.clear();
         rooms.remove(roomName);
+        roomTokens.remove(roomName);
         roomOwners.remove(roomName);
         logger.info("Room closed: {}", roomName);
     }

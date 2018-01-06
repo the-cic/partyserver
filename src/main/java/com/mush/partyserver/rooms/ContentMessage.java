@@ -11,7 +11,8 @@ import java.util.Map;
  *
  * @author cic
  */
-public class Message {
+public class ContentMessage {
     public String target;
-    public Map<String, Object> content;
+    public String subject;
+    public Map<String, Object> body;
 }

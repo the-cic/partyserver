@@ -17,9 +17,11 @@ public class Guest {
     private String room = null;
     private boolean isRoomOwner = false;
 
+    private final long id;
     private final WebSocket socket;
 
-    public Guest(WebSocket ws) {
+    public Guest(long connectionId, WebSocket ws) {
+        this.id = connectionId;
         this.socket = ws;
     }
 
@@ -47,7 +49,7 @@ public class Guest {
     
     @Override
     public String toString(){
-        return socket.hashCode() + ":" + getLoginName() + "@" + getRoom();
+        return id + ":" + getLoginName() + "@" + getRoom();
     }
 
     /**
@@ -69,5 +71,12 @@ public class Guest {
      */
     public boolean getIsRoomOwner() {
         return isRoomOwner;
+    }
+
+    /**
+     * @return the id
+     */
+    public long getId() {
+        return id;
     }
 }

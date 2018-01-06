@@ -21,17 +21,17 @@ import org.java_websocket.server.WebSocketServer;
  */
 public class SocketServer extends WebSocketServer {
 
-    private int connectionCount = 0;
+    private long connectionCount = 0;
     private Logger logger;
     private GuestHandler handler;
-    private HashMap<Integer, Guest> guests;
+    private HashMap<WebSocket, Guest> guests;
 
-    public SocketServer(int port) {
+    public SocketServer(int port, GuestHandler handler0) {
         this(new InetSocketAddress(port));
         logger = LogManager.getLogger(this.getClass());
         logger.info("Created WebSocketServer on port {}", this.getPort());
         guests = new HashMap<>();
-        handler = new GuestHandler();
+        handler = handler0;
     }
 
     public SocketServer(InetSocketAddress address) {
@@ -41,25 +41,22 @@ public class SocketServer extends WebSocketServer {
     @Override
     public void onOpen(WebSocket ws, ClientHandshake ch) {
         connectionCount ++;
-        Guest guest = new Guest(ws);
-        guests.put(ws.hashCode(), guest);
+        Guest guest = new Guest(connectionCount, ws);
+        guests.put(ws, guest);
         handler.onNewGuest(guest);
-//        logger.info("open {}", ws.hashCode());
     }
 
     @Override
     public void onClose(WebSocket ws, int code, String reason, boolean remote) {
-        connectionCount --;
-        Guest guest = guests.get(ws.hashCode());
-        guests.remove(ws.hashCode());
+        Guest guest = guests.get(ws);
+        guests.remove(ws);
         handler.onGuestLeft(guest);
-//        logger.info("close {} : {} : {}", ws.hashCode(), code, reason);
     }
 
     @Override
     public void onMessage(WebSocket ws, String message) {
-        Guest guest = guests.get(ws.hashCode());
-        logger.info("message {} g:{} : {}", ws.hashCode(), guest, message);
+        Guest guest = guests.get(ws);
+        logger.info("message {} : {}", guest, message);
         
         handler.onMessage(message, guest);
     }
@@ -71,7 +68,6 @@ public class SocketServer extends WebSocketServer {
 
     @Override
     public void onStart() {
-//        logger.info("start");
     }
 
 }

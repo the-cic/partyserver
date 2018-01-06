@@ -56,3 +56,13 @@ body {
     font-size: 8px;
     white-space: pre;
 }
+
+.Button {
+    background-color: #FF6F00;
+    color: #110906;
+    padding: 5px 10px 5px 10px;
+    margin: 5px 10px 0px 5px;
+    text-align: center;
+    cursor: default;
+    display: inline-block
+}

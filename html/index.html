@@ -15,26 +15,39 @@
         <div ng-controller="MainController" class="App">
 
             <div class="Connection">
-                <input type="text" ng-model="roomInput"/>
-                <span>Room</span>
-                <br/>
-                <input type="text" ng-model="nameInput"/>
-                <span>Name</span>
-                <br />
-                <input type="checkbox" ng-model="masterInput"/>
-                <span>Master</span>
-                <br />
-                <span ng-click="onClickConnect()" class="disable-select">Connect</span>
-                <br />
-                <span>Connection status:</span>
-                <span>{{connectionStatus}}</span>
-                <br />
+                <div>
+                    <input type="checkbox" ng-model="masterInput"/>
+                    <span>Master</span>
+                </div>
+                <div ng-show="!masterInput">
+                    <input type="text" ng-model="roomInput"/>
+                    <span>Room</span>
+                </div>
+                <div ng-show="masterInput">
+                    <input type="text" ng-model="tokenInput"/>
+                    <span>Token</span>
+                    <br/>
+                </div>
+                <div>
+                    <input type="text" ng-model="nameInput"/>
+                    <span>Name</span>
+                </div>
+
+                <div class="Separator Thick"></div>
+
+                <div>
+                    <span ng-click="onClickConnect()" class="Button disable-select">Connect</span>
+                    <span>Connection status:</span>
+                    <span>{{connectionStatus}}</span>
+                </div>
+
+                <div class="Separator Thick"></div>
+
                 <span ng-click="onClickSend()" class="disable-select">Send</span>
                 <br/>
-                <br/>
-                <span class="Log">{{log}}</span>
+                <div class="Log">{{log}}</div>
             </div>
-            
+
         </div>
     </body>
 </html>
