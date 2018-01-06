@@ -1,0 +1,58 @@
+body {
+    background-color: #110906;
+}
+
+.App {
+    font-family: sans-serif;
+    text-transform: uppercase;
+    font-size: 8px;
+    color: #FFFFFF;
+    width: 1530px;
+}
+
+.Connection {
+    padding: 2px;
+    font-family: sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    color: #FF6F00;
+    margin: 2px 1px 4px 1px;
+}
+
+.Separator {
+    font-family: sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    color: #FF6F00;
+    border-bottom: 1px solid #FF6F00;
+    margin: 4px 1px 1px 1px;
+    padding: 2px;
+    position: relative;
+}
+
+.Separator.NoLine {
+    border-bottom: none;
+}
+
+.disable-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.Separator.Thick {
+    border-bottom: 3px solid #FF6F00;
+}
+
+.Scrollable {
+    overflow-y: scroll;
+    height: 100%;
+    position: relative;
+}
+
+.Log {
+    font-family: sans-serif;
+    font-size: 8px;
+    white-space: pre;
+}

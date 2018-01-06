@@ -11,7 +11,7 @@ import java.io.IOException;
 import org.restlet.Component;
 import org.restlet.data.Protocol;
 import org.restlet.resource.ResourceException;
-import websocket.SocketServer;
+import com.mush.partyserver.websocket.SocketServer;
 
 /**
  *
@@ -48,10 +48,6 @@ public class Main {
 
         ApiApplication application = new ApiApplication();
 
-//        Component c = new Component();
-//        c.getServers().add(Protocol.HTTP, port);
-//        c.getDefaultHost().attach(rootPath, application);
-
         Component c = new SecureComponent(config);
         c.getDefaultHost().attach(rootPath, application);
 
@@ -64,6 +60,7 @@ public class Main {
 
     private void startSocketApi(int port) {
         socketServer = new SocketServer(port);
+        socketServer.start();
     }
 
 }

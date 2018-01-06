@@ -1,0 +1,41 @@
+<!doctype html>
+<html ng-app="logApp">
+    <head>
+        <title>Log</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="js/angular.min.js"></script>
+        <script src="js/underscore-min.js"></script>
+        <script src="js/app.js"></script>
+        <script src="js/services.js"></script>
+        <script src="js/controller.js"></script>
+        <link rel="stylesheet" href="index.css">
+    </head>
+    <body>
+        <div ng-controller="MainController" class="App">
+
+            <div class="Connection">
+                <input type="text" ng-model="roomInput"/>
+                <span>Room</span>
+                <br/>
+                <input type="text" ng-model="nameInput"/>
+                <span>Name</span>
+                <br />
+                <input type="checkbox" ng-model="masterInput"/>
+                <span>Master</span>
+                <br />
+                <span ng-click="onClickConnect()" class="disable-select">Connect</span>
+                <br />
+                <span>Connection status:</span>
+                <span>{{connectionStatus}}</span>
+                <br />
+                <span ng-click="onClickSend()" class="disable-select">Send</span>
+                <br/>
+                <br/>
+                <span class="Log">{{log}}</span>
+            </div>
+            
+        </div>
+    </body>
+</html>
+
