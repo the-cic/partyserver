@@ -16,35 +16,70 @@
 
             <div class="Connection">
                 <div>
-                    <input type="checkbox" ng-model="masterInput"/>
-                    <span>Master</span>
-                </div>
-                <div ng-show="!masterInput">
-                    <input type="text" ng-model="roomInput"/>
-                    <span>Room</span>
-                </div>
-                <div ng-show="masterInput">
-                    <input type="text" ng-model="tokenInput"/>
-                    <span>Token</span>
-                    <br/>
-                </div>
-                <div>
-                    <input type="text" ng-model="nameInput"/>
-                    <span>Name</span>
-                </div>
-
-                <div class="Separator Thick"></div>
-
-                <div>
-                    <span ng-click="onClickConnect()" class="Button disable-select">Connect</span>
                     <span>Connection status:</span>
                     <span>{{connectionStatus}}</span>
                 </div>
 
                 <div class="Separator Thick"></div>
 
-                <span ng-click="onClickSend()" class="disable-select">Send</span>
-                <br/>
+                <div ng-show="disconnected" >
+                    <div>
+                        <input type="checkbox" ng-model="masterInput"/>
+                        <span>Master</span>
+                    </div>
+                    <div ng-show="!masterInput">
+                        <input type="text" ng-model="roomInput"/>
+                        <span>Room</span>
+                    </div>
+                    <div ng-show="masterInput">
+                        <input type="text" ng-model="tokenInput"/>
+                        <span>Token</span>
+                        <br/>
+                    </div>
+                    <div>
+                        <input type="text" ng-model="nameInput"/>
+                        <span>Name</span>
+                    </div>
+
+                    <div class="Separator Thick"></div>
+
+                    <div>
+                        <span ng-click="onClickConnect()" class="Button disable-select">Connect</span>
+                        <span ng-show="connectionError">{{connectionError}}</span>
+                    </div>
+                </div>
+
+                <div ng-show="loggedIn">
+                    
+                    <div ng-show="isMaster">
+                        Master Content
+                        <div ng-show="content.roomCode">
+                            Room code: {{content.roomCode}}
+                        </div>
+                        
+                        <span ng-click="onClickTestSend()" class="disable-select">Send form test</span>
+                    </div>
+                    
+                    <div ng-hide="isMaster">
+                        Guest Content
+                        <div ng-if="content.action === 'standBy'">
+                            <span ng-show="content.standByText">{{content.standByText}}<br/></span>
+
+                        </div>
+                        <div ng-if="content.action === 'showForm'">
+                            <div>{{content.form.title}}</div>
+                            <div ng-repeat="item in content.form.fields">
+                                <input type="text" ng-model="item.value" />
+                                <span>{{item.name}}</span>
+                            </div>
+                            <span ng-click="onClickSendForm()" class="Button disable-select">Send</span>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="Separator Thick"></div>
+
                 <div class="Log">{{log}}</div>
             </div>
 

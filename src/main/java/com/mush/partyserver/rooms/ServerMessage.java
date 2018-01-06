@@ -8,11 +8,13 @@ package com.mush.partyserver.rooms;
 import java.util.Map;
 
 /**
- *
+ * 
  * @author cic
  */
-public class ContentMessage {
-    public String target;
+public class ServerMessage {
+    
     public String subject;
+    
     public Map<String, Object> body;
+
 }

@@ -5,18 +5,16 @@
  */
 package com.mush.partyserver.rooms;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
+ * Message from the client to the server.
  *
  * @author cic
  */
-public class LoginMessage {
-    public String login;
-    
-    @JsonProperty(required = false)
-    public String room;
-    
-    @JsonProperty(required = false)
-    public String token;
+public class ClientMessage extends ServerMessage {
+
+    /**
+     * Must include target recipient of message
+     */
+    public String target;
+
 }

@@ -68,7 +68,7 @@ public class GuestHandler {
             }
         } else {
             try {
-                processMessage(message, guest);
+                processClientMessage(message, guest);
 
             } catch (IOException | RoomsException ex) {
                 logger.info("Message from {} failed : {}", guest, ex.getMessage());
@@ -79,11 +79,11 @@ public class GuestHandler {
 
     /**
      * Login a guest to an existing room, or create a new room for a room owner
-     * 
+     *
      * @param message
      * @param guest
      * @throws IOException
-     * @throws RoomsException 
+     * @throws RoomsException
      */
     private void login(String message, Guest guest) throws IOException, RoomsException {
         ObjectMapper mapper = new ObjectMapper();
@@ -105,6 +105,8 @@ public class GuestHandler {
 
         rooms.addGuestToRoom(guest.getRoom(), guest);
 
+        sendGuestLoginAccepted(guest);
+
         if (guest.getIsRoomOwner()) {
             sendNewRoom(guest);
         } else if (rooms.roomHasOwner(guest.getRoom())) {
@@ -116,27 +118,30 @@ public class GuestHandler {
     private void sendNewRoom(Guest owner) {
         HashMap<String, Object> content = new HashMap<>();
         content.put("name", owner.getRoom());
-        sendMessageToOwner(owner, "roomCreated", content);
+        sendMessageToGuest(owner, "roomCreated", content);
     }
 
     private void sendGuestConnected(Guest owner, Guest guest) {
         HashMap<String, Object> content = new HashMap<>();
         content.put("name", guest.getLoginName());
-        sendMessageToOwner(owner, "userConnected", content);
+        sendMessageToGuest(owner, "userConnected", content);
+    }
+
+    private void sendGuestLoginAccepted(Guest guest) {
+        sendMessageToGuest(guest, "loginAccepted", null);
     }
 
     private void sendGuestDisonnected(Guest owner, Guest guest) {
         HashMap<String, Object> content = new HashMap<>();
         content.put("name", guest.getLoginName());
-        sendMessageToOwner(owner, "userDisconnected", content);
+        sendMessageToGuest(owner, "userDisconnected", content);
     }
 
-    private void sendMessageToOwner(Guest owner, String subject, HashMap<String, Object> body) {
-        ContentMessage message = new ContentMessage();
-        message.target = "";
+    private void sendMessageToGuest(Guest guest, String subject, HashMap<String, Object> body) {
+        ServerMessage message = new ServerMessage();
         message.subject = subject;
         message.body = body;
-        owner.send(jsonForObject(message));
+        guest.send(jsonForObject(message));
     }
 
     private void verifyToken(String token) throws RoomsException {
@@ -167,15 +172,16 @@ public class GuestHandler {
 
     /**
      * Route the message to the proper recipient(s)
+     *
      * @param messageString
      * @param guest
      * @throws IOException
-     * @throws RoomsException 
+     * @throws RoomsException
      */
-    private void processMessage(String messageString, Guest guest) throws IOException, RoomsException {
+    private void processClientMessage(String messageString, Guest guest) throws IOException, RoomsException {
         ObjectMapper mapper = new ObjectMapper();
 
-        ContentMessage message = mapper.readValue(messageString, ContentMessage.class);
+        ClientMessage message = mapper.readValue(messageString, ClientMessage.class);
 
         switch (message.target) {
             case "":

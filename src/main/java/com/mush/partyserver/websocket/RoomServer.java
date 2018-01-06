@@ -56,7 +56,7 @@ public class RoomServer extends WebSocketServer {
     @Override
     public void onMessage(WebSocket ws, String message) {
         Guest guest = guests.get(ws);
-        logger.info("message {} : {}", guest, message);
+        logger.info("Message from {} : {}", guest, message);
         
         handler.onMessage(message, guest);
     }
