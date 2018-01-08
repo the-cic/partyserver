@@ -5,13 +5,15 @@
  */
 package com.mush.partyserver.rooms;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Map;
 
 /**
  * 
  * @author cic
  */
-public class ServerMessage {
+@JsonIgnoreProperties(ignoreUnknown = false)
+public class ContentMessage {
     
     public String subject;
     

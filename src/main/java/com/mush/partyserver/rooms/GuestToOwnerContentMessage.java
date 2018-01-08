@@ -6,15 +6,11 @@
 package com.mush.partyserver.rooms;
 
 /**
- * Message from the client to the server.
- *
+ * Message from a guest sent to the owner
+ * 
  * @author cic
  */
-public class ClientMessage extends ServerMessage {
-
-    /**
-     * Must include target recipient of message
-     */
-    public String target;
-
+public class GuestToOwnerContentMessage extends ContentMessage {
+    
+    public String from;
 }

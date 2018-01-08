@@ -56,6 +56,10 @@
                         <div ng-show="content.roomCode">
                             Room code: {{content.roomCode}}
                         </div>
+                        <div>
+                            Connected users:
+                            <span ng-repeat="user in users"> {{user}} </span>
+                        </div>
                         
                         <span ng-click="onClickTestSend()" class="disable-select">Send form test</span>
                     </div>

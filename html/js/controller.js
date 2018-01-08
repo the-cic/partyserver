@@ -29,6 +29,9 @@ angular.module('logApp')
                 self.master = $scope.masterInput;
                 self.token = $scope.tokenInput;
                 $scope.isMaster = self.master;
+                if (self.master) {
+                    $scope.users = [];
+                }
                 if (DataService.connect()) {
                     $scope.connectionStatus = "Connecting...";
                 }
@@ -88,18 +91,32 @@ angular.module('logApp')
                         $scope.content.roomCode = message.body.name;
                         break;
                     case "userConnected":
+                        $scope.users.push(message.body.name);
                         self.sendWaitMessage(message.body.name, "Hello " + message.body.name + ", please wait a while.");
                         break;
-                    case "standBy":
-                        $scope.content.action = "standBy";
-                        $scope.content.standByText = message.body.text;
+                    case "userDisconnected":
+                        var userIndex = $scope.users.indexOf(message.body.name);
+                        if (userIndex > -1) {
+                            $scope.users.splice(userIndex, 1);
+                        }
                         break;
-                    case "showForm":
-                        $scope.content.action = "showForm";
-                        $scope.content.form = message.body;
+                    case "command":
+                        self.showCommand(message);
                         break;
                 }
                 $scope.$apply();
+            };
+
+            self.showCommand = function (message) {
+                $scope.content.action = message.body.action;
+                switch (message.body.action) {
+                    case "standBy":
+                        $scope.content.standByText = message.body.text;
+                        break;
+                    case "showForm":
+                        $scope.content.form = message.body.form;
+                        break;
+                }
             };
 
             self.onSocketClose = function () {
@@ -113,9 +130,9 @@ angular.module('logApp')
 
             self.sendWaitMessage = function (user, text) {
                 var message = {
-                    target: user,
-                    subject: "standBy",
+                    to: [user],
                     body: {
+                        action: "standBy",
                         text: text
                     }
                 };
@@ -128,8 +145,6 @@ angular.module('logApp')
                     values[field.name] = field.value;
                 });
                 var message = {
-                    target: "",
-                    subject: "formResponse",
                     body: {
                         id: form.id,
                         values: values
@@ -140,9 +155,11 @@ angular.module('logApp')
 
             self.sendShowFormMessage = function (form) {
                 var message = {
-                    target: "*",
-                    subject: "showForm",
-                    body: form
+                    to: $scope.users,
+                    body: {
+                        action: "showForm",
+                        form: form
+                    }
                 };
                 DataService.send(JSON.stringify(message));
             };

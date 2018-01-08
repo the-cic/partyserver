@@ -6,6 +6,7 @@
 package com.mush.partyserver.rooms;
 
 import com.mush.partyserver.rooms.exceptions.NameAlreadyInRoomException;
+import com.mush.partyserver.rooms.exceptions.LognNameNotValidException;
 import com.mush.partyserver.rooms.exceptions.RoomDoesNotExistException;
 import com.mush.partyserver.rooms.exceptions.RoomsException;
 import java.util.Collection;
@@ -65,6 +66,22 @@ public class Rooms {
         return roomOwners.containsKey(roomName);
     }
 
+    public boolean guestNameIsValid(String guestName) {
+        if (guestName.length() > 64 || guestName.length() == 0) {
+            return false;
+        }
+        char[] chars = guestName.toCharArray();
+        if (Character.isWhitespace(chars[0])) {
+            return false;
+        }
+        for (char c : chars) {
+            if (!Character.isAlphabetic(c) && !Character.isDigit(c) && !Character.isWhitespace(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public Guest getRoomOwner(String roomName) throws RoomDoesNotExistException {
         if (!roomExists(roomName)) {
             throw new RoomDoesNotExistException(roomName);
@@ -87,6 +104,10 @@ public class Rooms {
         if (roomHasGuest(roomName, guest.getLoginName())) {
             guest.clearRoom();
             throw new NameAlreadyInRoomException(guest.getLoginName());
+        }
+        if (!guestNameIsValid(guest.getLoginName())) {
+            guest.clearRoom();
+            throw new LognNameNotValidException(guest.getLoginName());
         }
         HashMap<String, Guest> room = rooms.get(roomName);
         room.put(guest.getLoginName(), guest);
@@ -138,6 +159,17 @@ public class Rooms {
         roomTokens.remove(roomName);
         roomOwners.remove(roomName);
         logger.info("Room closed: {}", roomName);
+    }
+
+    public boolean isGuestARoomOwner(Guest guest) throws RoomDoesNotExistException {
+        if (!guest.getIsRoomOwner()) {
+            return false;
+        }
+        String room = guest.getRoom();
+        if (!roomHasOwner(room)) {
+            return false;
+        }
+        return guest.equals(getRoomOwner(room));
     }
 
     private String newRoomName() throws RoomsException {
