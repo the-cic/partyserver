@@ -36,7 +36,7 @@ public class Config {
 
     private String rootUri;
     private int httpPort;
-    private int httpsPort;
+    private Integer httpsPort;
     private int socketPort;
     private boolean socketSsl;
     private long loginTimeoutSeconds;
@@ -63,7 +63,7 @@ public class Config {
         return socketPort;
     }
 
-    public int getHttpsPort() {
+    public Integer getHttpsPort() {
         return httpsPort;
     }
 
@@ -113,7 +113,7 @@ public class Config {
         rootUri = http.getString("rootUri", "html");
 
         SubnodeConfiguration https = ini.getSection("https");
-        httpsPort = https.getInt("port");
+        httpsPort = https.getInteger("port", null);
         keyStorePath = https.getString("keyStorePath");
         keyStorePassword = https.getString("keyStorePassword");
         keyPassword = https.getString("keyPassword");

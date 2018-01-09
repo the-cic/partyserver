@@ -6,6 +6,7 @@
 package com.mush.partyserver;
 
 import com.mush.partyserver.restlet.ApiApplication;
+import com.mush.partyserver.restlet.SecureComponent;
 import com.mush.partyserver.rooms.GuestHandler;
 import com.mush.partyserver.websocket.SecureRoomServer;
 import org.restlet.Component;
@@ -47,11 +48,17 @@ public class Main {
     private void startRestApi() {
         ApiApplication application = new ApiApplication(config);
 
-        Component c = new Component();
-        
-        c.getServers().add(Protocol.HTTP, config.getHttpPort());
+        Component c;
+
+        if (config.getHttpsPort() == null) {
+            c = new Component();
+            c.getServers().add(Protocol.HTTP, config.getHttpPort());
+        } else {
+            c = new SecureComponent(config);
+        }
+
         c.getClients().add(Protocol.FILE);
-        
+
         c.getDefaultHost().attach("", application);
 
         try {
@@ -64,7 +71,7 @@ public class Main {
     private void startSocketApi(int port) {
         handler = new GuestHandler(config);
         socketServer = new SecureRoomServer(port, handler);
-        ((SecureRoomServer)socketServer).makeSecure(config);
+        ((SecureRoomServer) socketServer).makeSecure(config);
         socketServer.start();
     }
 
