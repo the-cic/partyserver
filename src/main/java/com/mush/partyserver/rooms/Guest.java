@@ -6,6 +6,7 @@
 package com.mush.partyserver.rooms;
 
 import org.java_websocket.WebSocket;
+import org.java_websocket.framing.CloseFrame;
 
 /**
  *
@@ -19,18 +20,20 @@ public class Guest {
 
     private final long id;
     private final WebSocket socket;
+    private final long connectedAt;
 
     public Guest(long connectionId, WebSocket ws) {
         this.id = connectionId;
         this.socket = ws;
+        this.connectedAt = System.currentTimeMillis();
     }
 
     public void send(String message) {
         this.socket.send(message);
     }
 
-    public void kick() {
-        this.socket.close();
+    public void kick(String message) {
+        this.socket.close(CloseFrame.NORMAL, message);
     }
 
     public boolean isLoggedIn() {
@@ -52,6 +55,10 @@ public class Guest {
         return id + ":" + getLoginName() + "@" + getRoom();
     }
 
+    public long getConnectionDuration(){
+        return System.currentTimeMillis() - connectedAt;
+    }
+    
     /**
      * @return the loginName
      */

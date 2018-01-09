@@ -23,6 +23,7 @@ public class Main {
 
     public final Config config;
     private RoomServer socketServer;
+    private GuestHandler handler;
 
     private Main(String[] args) {
         config = new Config();
@@ -59,10 +60,17 @@ public class Main {
     }
 
     private void startSocketApi(int port) {
-        GuestHandler handler = new GuestHandler(config);
+        handler = new GuestHandler(config);
         socketServer = new SecureRoomServer(port, handler);
         ((SecureRoomServer)socketServer).makeSecure(config);
         socketServer.start();
+    }
+
+    /**
+     * @return the socketServer
+     */
+    public RoomServer getRoomServer() {
+        return socketServer;
     }
 
 }

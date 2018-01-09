@@ -10,8 +10,8 @@ import com.mush.partyserver.rooms.exceptions.LognNameNotValidException;
 import com.mush.partyserver.rooms.exceptions.RoomDoesNotExistException;
 import com.mush.partyserver.rooms.exceptions.RoomsException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,16 +24,16 @@ public class Rooms {
     /**
      * Map by room name, of client name -> client info
      */
-    private HashMap<String, HashMap<String, Guest>> rooms;
-    private HashMap<String, Guest> roomOwners;
-    private HashMap<String, String> roomTokens;
+    private Map<String, Map<String, Guest>> rooms;
+    private Map<String, Guest> roomOwners;
+    private Map<String, String> roomTokens;
     private Logger logger;
 
     public Rooms() {
         logger = LogManager.getLogger(this.getClass());
-        rooms = new HashMap<>();
-        roomOwners = new HashMap<>();
-        roomTokens = new HashMap<>();
+        rooms = new ConcurrentHashMap<>();
+        roomOwners = new ConcurrentHashMap<>();
+        roomTokens = new ConcurrentHashMap<>();
     }
 
     /**
@@ -48,7 +48,7 @@ public class Rooms {
             throw new RoomsException("Room for this token is in use");
         }
         String roomName = newRoomName();
-        rooms.put(roomName, new HashMap<>());
+        rooms.put(roomName, new ConcurrentHashMap<>());
         roomTokens.put(roomName, token);
         logger.info("New room created: {}", roomName);
         return roomName;
@@ -109,7 +109,7 @@ public class Rooms {
             guest.clearRoom();
             throw new LognNameNotValidException(guest.getLoginName());
         }
-        HashMap<String, Guest> room = rooms.get(roomName);
+        Map<String, Guest> room = rooms.get(roomName);
         room.put(guest.getLoginName(), guest);
         logger.info("Guest {} added to room {}", guest, roomName);
     }
@@ -119,7 +119,7 @@ public class Rooms {
             guest.clearRoom();
             throw new RoomDoesNotExistException(guest.getRoom());
         }
-        HashMap<String, Guest> room = rooms.get(guest.getRoom());
+        Map<String, Guest> room = rooms.get(guest.getRoom());
         Guest guestInRoom = room.get(guest.getLoginName());
         if (guest.equals(guestInRoom)) {
             room.remove(guest.getLoginName());
@@ -132,7 +132,7 @@ public class Rooms {
         if (!roomExists(roomName)) {
             throw new RoomDoesNotExistException(roomName);
         }
-        HashMap<String, Guest> room = rooms.get(roomName);
+        Map<String, Guest> room = rooms.get(roomName);
         return room.get(guestName);
     }
 
@@ -140,7 +140,7 @@ public class Rooms {
         if (!roomExists(roomName)) {
             throw new RoomDoesNotExistException(roomName);
         }
-        HashMap<String, Guest> room = rooms.get(roomName);
+        Map<String, Guest> room = rooms.get(roomName);
         return room.values();
     }
 
@@ -148,13 +148,15 @@ public class Rooms {
         if (!roomExists(roomName)) {
             throw new RoomDoesNotExistException(roomName);
         }
-        HashMap<String, Guest> room = rooms.get(roomName);
+        
+        Map<String, Guest> room = rooms.get(roomName);
         for (Map.Entry<String, Guest> e : room.entrySet()) {
             Guest guest = e.getValue();
             logger.info("Kicking guest: {}", guest);
-            guest.kick();
+            guest.kick("Room closed");
         }
         room.clear();
+        
         rooms.remove(roomName);
         roomTokens.remove(roomName);
         roomOwners.remove(roomName);
@@ -194,5 +196,9 @@ public class Rooms {
         }
 
         return sb.toString();
+    }
+
+    public int getRoomCount() {
+        return rooms.size();
     }
 }

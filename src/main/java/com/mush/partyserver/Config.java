@@ -38,6 +38,9 @@ public class Config {
     private int httpsPort;
     private int socketPort;
     private boolean socketSsl;
+    private long loginTimeoutSeconds;
+    private long loginTimeoutCheckSeconds;
+
     private String keyStorePath;
     private String keyStorePassword;
     private String keyPassword;
@@ -116,6 +119,8 @@ public class Config {
         SubnodeConfiguration socket = ini.getSection("websocket");
         socketPort = socket.getInt("port");
         socketSsl = socket.getBoolean("ssl");
+        loginTimeoutSeconds = socket.getInt("loginTimeoutSeconds", 10);
+        loginTimeoutCheckSeconds = socket.getInt("loginTimeoutCheckSeconds", 60);
 
         userTokens = new HashMap<>();
         tokenUsers = new HashMap<>();
@@ -148,6 +153,20 @@ public class Config {
         }
 
         return null;
+    }
+
+    /**
+     * @return the loginTimeoutSeconds
+     */
+    public long getLoginTimeoutMillis() {
+        return loginTimeoutSeconds * 1000;
+    }
+
+    /**
+     * @return the loginTimeoutCheckSeconds
+     */
+    public long getLoginTimeoutCheckMillis() {
+        return loginTimeoutCheckSeconds * 1000;
     }
 
 }

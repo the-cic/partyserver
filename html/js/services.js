@@ -32,14 +32,16 @@ angular.module('logApp')
                 socket.onopen = function () {
                     connected = true;
                     connecting = false;
+                    console.log('connected');
                     service.listener.onSocketOpen();
                 };
 
-                socket.onclose = function () {
+                socket.onclose = function (message) {
                     connected = false;
                     connecting = false;
                     socket = false;
-                    service.listener.onSocketClose();
+                    console.log('connection closed');
+                    service.listener.onSocketClose(message.reason);
                 };
 
                 socket.onmessage = function (message) {

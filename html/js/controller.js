@@ -119,11 +119,11 @@ angular.module('logApp')
                 }
             };
 
-            self.onSocketClose = function () {
+            self.onSocketClose = function (reason) {
                 $scope.disconnected = true;
                 $scope.loggedIn = false;
                 $scope.connectionStatus = "Disconnected";
-                $scope.log += "\n" + "Disconnected";
+                $scope.log += "\n" + "Disconnected : " + reason;
                 $scope.content.action = "";
                 $scope.$apply();
             };

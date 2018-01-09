@@ -10,8 +10,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mush.partyserver.Config;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,15 +37,32 @@ public class GuestHandler {
     private final Logger logger;
     private final Rooms rooms;
     private final GuestVerification verification;
+    private final Map<Long, Guest> guestsPendingLogin;
+    private final LoginTimeoutChecker loginTimeoutChecker;
+    private final Thread loginTimeoutThread;
+    private final long loginTimeoutMillis;
 
-    public GuestHandler(Config config0) {
+    public GuestHandler(Config config) {
         logger = LogManager.getLogger(this.getClass());
         rooms = new Rooms();
-        verification = new GuestVerification(config0);
+        verification = new GuestVerification(config);
+        guestsPendingLogin = new ConcurrentHashMap<>();
+        loginTimeoutChecker = new LoginTimeoutChecker(this, config.getLoginTimeoutCheckMillis());
+        loginTimeoutThread = new Thread(loginTimeoutChecker);
+        loginTimeoutMillis = config.getLoginTimeoutMillis();
+    }
+    
+    public Rooms getRooms() {
+        return rooms;
+    }
+
+    public void onStart() {
+        loginTimeoutThread.start();
     }
 
     public void onNewGuest(Guest guest) {
         logger.info("New guest connected: {}", guest);
+        guestsPendingLogin.put(guest.getId(), guest);
     }
 
     public void onGuestLeft(Guest guest) {
@@ -62,6 +82,8 @@ public class GuestHandler {
             } catch (RoomsException ex) {
                 logger.info(ex.getMessage());
             }
+        } else {
+            guestsPendingLogin.remove(guest.getId());
         }
     }
 
@@ -80,6 +102,22 @@ public class GuestHandler {
             } catch (IOException | RoomsException ex) {
                 logger.info("Message from {} failed : {}", guest, ex.getMessage());
                 guest.send(jsonForException(ex));
+            }
+        }
+    }
+
+    public void checkGuestsPendingLogin() {
+        synchronized (guestsPendingLogin) {
+            List<Guest> timeouts = new ArrayList<>();
+            for (Guest guest : guestsPendingLogin.values()) {
+                long connectionDuration = guest.getConnectionDuration();
+                if (connectionDuration > loginTimeoutMillis) {
+                    logger.warn("Guest {} login timeout after {} ms", guest, connectionDuration);
+                    timeouts.add(guest);
+                }
+            }
+            for (Guest guest : timeouts) {
+                guest.kick("Login timeout");
             }
         }
     }
@@ -111,6 +149,7 @@ public class GuestHandler {
                 guest.login(loginMessage.login, loginMessage.room, false);
             }
 
+            guestsPendingLogin.remove(guest.getId());
             rooms.addGuestToRoom(guest.getRoom(), guest);
 
             sendGuestLoginAccepted(guest);
@@ -127,7 +166,7 @@ public class GuestHandler {
             guest.send(jsonForException(ex));
 
             logger.info("Kicking guest: " + guest);
-            guest.kick();
+            guest.kick("Login failed");
         }
     }
 
