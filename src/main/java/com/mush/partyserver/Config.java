@@ -34,6 +34,7 @@ public class Config {
 
     private final Logger logger;
 
+    private String rootUri;
     private int httpPort;
     private int httpsPort;
     private int socketPort;
@@ -109,6 +110,7 @@ public class Config {
 
         SubnodeConfiguration http = ini.getSection("http");
         httpPort = http.getInt("port");
+        rootUri = http.getString("rootUri", "html");
 
         SubnodeConfiguration https = ini.getSection("https");
         httpsPort = https.getInt("port");
@@ -167,6 +169,13 @@ public class Config {
      */
     public long getLoginTimeoutCheckMillis() {
         return loginTimeoutCheckSeconds * 1000;
+    }
+
+    /**
+     * @return the rootUri
+     */
+    public String getRootUri() {
+        return rootUri;
     }
 
 }

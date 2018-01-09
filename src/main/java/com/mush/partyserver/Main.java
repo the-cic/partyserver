@@ -6,12 +6,12 @@
 package com.mush.partyserver;
 
 import com.mush.partyserver.restlet.ApiApplication;
-import com.mush.partyserver.restlet.SecureComponent;
 import com.mush.partyserver.rooms.GuestHandler;
 import com.mush.partyserver.websocket.SecureRoomServer;
 import org.restlet.Component;
 import org.restlet.resource.ResourceException;
 import com.mush.partyserver.websocket.RoomServer;
+import org.restlet.data.Protocol;
 
 /**
  *
@@ -45,12 +45,14 @@ public class Main {
     }
 
     private void startRestApi() {
-        String rootPath = "";
+        ApiApplication application = new ApiApplication(config);
 
-        ApiApplication application = new ApiApplication();
-
-        Component c = new SecureComponent(config);
-        c.getDefaultHost().attach(rootPath, application);
+        Component c = new Component();
+        
+        c.getServers().add(Protocol.HTTP, config.getHttpPort());
+        c.getClients().add(Protocol.FILE);
+        
+        c.getDefaultHost().attach("", application);
 
         try {
             c.start();
