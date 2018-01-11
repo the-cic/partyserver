@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('logApp', [])
+angular.module('clientApp', [])
         .filter('reverse', function () {
             return function (items) {
                 if (!items) {

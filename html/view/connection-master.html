@@ -1,0 +1,27 @@
+<div class="Connection">
+    <div>
+        <span>Connection status:</span>
+        <span>{{connectionStatus}}</span>
+    </div>
+
+    <div class="Separator Thick"></div>
+
+    <div ng-show="disconnected" >
+        <div>
+            <input type="text" ng-model="login.tokenInput"/>
+            <span>Token</span>
+            <br/>
+        </div>
+        <div>
+            <input type="text" ng-model="login.nameInput"/>
+            <span>Name</span>
+        </div>
+
+        <div class="Separator Thick"></div>
+
+        <div>
+            <span ng-click="onClickConnect()" class="Button disable-select">Connect</span>
+            <span ng-show="connectionError">{{connectionError}}</span>
+        </div>
+    </div>
+</div>
