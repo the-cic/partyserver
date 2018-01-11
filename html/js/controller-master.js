@@ -17,6 +17,10 @@ angular.module('clientApp')
                 self.sendAssets();
             };
 
+            $scope.onClickSendViewBox = function () {
+                self.sendViewBox();
+            };
+
             self.onClickConnect = function () {
                 self.name = $scope.login.nameInput;
                 self.token = $scope.login.tokenInput;
@@ -99,8 +103,37 @@ angular.module('clientApp')
                         action: "storeAssets",
                         assets: {
                             blob: self.assets.blob,
-                            docking: self.assets.docking
+                            docking: self.assets.docking,
+                            landscape: self.assets.landscape
                         }
+                    }
+                };
+                DataService.send(JSON.stringify(message));
+            };
+
+            self.sendViewBox = function () {
+                var message = {
+                    to: $scope.users,
+                    body: {
+                        action: "showViewBox",
+                        items: [
+                            {
+                                id: 'landscape',
+                                background: true
+                            },
+                            {
+                                id: 'blob',
+                                x: 50 + Math.random() * 40,
+                                y: 15 + Math.random() * 30,
+                                width: 20
+                            },
+                            {
+                                id: 'docking',
+                                x: 10 + Math.random() * 20,
+                                y: 55 + Math.random() * 10,
+                                width: 5
+                            }
+                        ]
                     }
                 };
                 DataService.send(JSON.stringify(message));
@@ -114,6 +147,7 @@ angular.module('clientApp')
                 $http.get(assetUrl, {responseType: 'blob'}).then(function (data) {
                     var reader = new FileReader();
                     reader.onloadend = function (e) {
+                        console.log("Loaded asset:" + assetName);
                         self.assets[assetName] = e.target.result;
                     };
                     reader.readAsDataURL(data.data);
@@ -122,6 +156,7 @@ angular.module('clientApp')
 
             self.loadAsset('blob', 'img/blob.jpg');
             self.loadAsset('docking', 'img/docking.png');
+            self.loadAsset('landscape', 'img/landscape.jpg');
 
         });
 

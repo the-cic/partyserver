@@ -7,12 +7,12 @@ angular.module('clientApp')
             };
 
             console.log("Loading config");
-            
+
             $http.get('config.json').then(function (res) {
                 service.config = res.data;
                 console.log("Config loaded");
             });
-            
+
             return service;
         })
         .factory('DataService', function (ConfigService) {
@@ -99,14 +99,14 @@ angular.module('clientApp')
             controller.onSocketOpen = function () {
                 delegate.onSocketOpen();
                 $scope.connectionStatus = "Connected";
-                $scope.log += "\n" + "Connected";
+                controller.log('Connected');
                 $scope.$apply();
                 var message = delegate.getLoginMessage();
                 DataService.send(JSON.stringify(message));
             };
 
             controller.onSocketMessage = function (message) {
-                $scope.log += "\n" + JSON.stringify(message);
+                controller.log(JSON.stringify(message));
                 if (message.error) {
                     $scope.connectionError = message.error;
                 }
@@ -123,9 +123,16 @@ angular.module('clientApp')
                 $scope.disconnected = true;
                 $scope.loggedIn = false;
                 $scope.connectionStatus = "Disconnected";
-                $scope.log += "\n" + "Disconnected : " + reason;
+                controller.log("Disconnected : " + reason);
                 delegate.onSocketClose();
                 $scope.$apply();
+            };
+
+            controller.log = function (message) {
+                if (message.length > 255) {
+                    message = message.substring(0, 255) + '...';
+                }
+                $scope.log += "\n" + message;
             };
 
             DataService.setListener(controller);

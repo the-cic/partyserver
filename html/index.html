@@ -32,9 +32,19 @@
                 </div>
                 <div>
                     Asset library:
-                    <div ng-repeat="(name, content) in content.assets">
+                    <div ng-repeat="(name, asset) in content.assets">
                         <span>{{name}} : </span>
-                        <img ng-src="{{content}}" />
+                        <img ng-src="{{asset}}" />
+                    </div>
+                </div>
+
+                <div class="ViewBoxContainer" ng-if="content.viewBox">
+                    <div class="ViewBox">
+                        <img ng-repeat="item in content.viewBox"
+                             ng-src="{{content.assets[item.id]}}"
+                             ng-class="item.class"
+                             ng-style="item.style"
+                             />
                     </div>
                 </div>
 

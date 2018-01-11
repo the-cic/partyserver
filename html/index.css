@@ -7,7 +7,7 @@ body {
     text-transform: uppercase;
     font-size: 8px;
     color: #FFFFFF;
-    width: 1530px;
+    /*width: 1530px;*/
 }
 
 .Connection {
@@ -75,3 +75,34 @@ body {
     cursor: default;
     display: inline-block
 }
+
+.ViewBoxContainer {
+    max-width: 1024px;
+}
+.ViewBox {
+    position: relative;
+    overflow: hidden;
+}
+.ViewBox img {
+    display: block;
+    image-rendering: optimizeSpeed;             /* STOP SMOOTHING, GIVE ME SPEED  */
+    image-rendering: -moz-crisp-edges;          /* Firefox                        */
+    image-rendering: -o-crisp-edges;            /* Opera                          */
+    image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+    image-rendering: pixelated; /* Chrome */
+    image-rendering: optimize-contrast;         /* CSS3 Proposed                  */
+    -ms-interpolation-mode: nearest-neighbor;   /* IE8+                           */
+}
+.ViewBox .Background {
+    width: 100%;
+    height: auto;
+}
+.ViewBox .Sprite {
+  position: absolute;
+/*  top: 25%;
+  left: 60%;
+  width: 20%;*/
+  height: auto;
+}
+
+

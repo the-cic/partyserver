@@ -52,10 +52,25 @@ angular.module('clientApp')
                         $scope.content.form = message.body.form;
                         break;
                     case "storeAssets":
-                        message.body.assets;
                         _.each(message.body.assets, function (value, key) {
                             $scope.content.assets[key] = value;
                         });
+                        break;
+                    case "showViewBox":
+                        var viewBox = [];
+                        _.each(message.body.items, function (item) {
+                            var viewItem = {
+                                id: item.id,
+                                class: item.background ? 'Background' : 'Sprite',
+                                style: item.background ? {} : {
+                                    left: item.x + '%',
+                                    top: item.y + '%',
+                                    width: item.width + '%'
+                                }
+                            };
+                            viewBox.push(viewItem);
+                        });
+                        $scope.content.viewBox = viewBox;
                         break;
                 }
             };
@@ -63,6 +78,7 @@ angular.module('clientApp')
             self.onSocketClose = function () {
                 $scope.content.action = "";
                 $scope.content.assets = {};
+                $scope.content.viewBox = false;
             };
 
             self.sendForm = function () {
