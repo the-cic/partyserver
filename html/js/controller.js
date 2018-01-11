@@ -18,8 +18,12 @@ angular.module('clientApp')
                 self.sendForm();
             };
 
+            $scope.onPressJoystick = function (direction) {
+                self.pressJoystick(direction);
+            };
+
             self.onClickConnect = function () {
-                self.room = $scope.login.roomInput;
+                self.room = $scope.login.roomInput.toUpperCase();
                 self.name = $scope.login.nameInput;
             };
 
@@ -72,6 +76,15 @@ angular.module('clientApp')
                         });
                         $scope.content.viewBox = viewBox;
                         break;
+                    case "showJoystick":
+                        $scope.content.joystick = {
+                            '4': {n: 1, s: 1, e: 1, w: 1},
+                            '8': {nw: 1, n: 1, ne: 1, w: 1, e: 1, sw: 1, s: 1, se: 1}
+                        }[message.body.directions];
+                        break;
+                    case "hideJoystick":
+                        $scope.content.joystick = false;
+                        break;
                 }
             };
 
@@ -79,21 +92,29 @@ angular.module('clientApp')
                 $scope.content.action = "";
                 $scope.content.assets = {};
                 $scope.content.viewBox = false;
+                $scope.content.joystick = false;
             };
 
             self.sendForm = function () {
-                self.sendResponseMessage($scope.content.form);
+                self.sendFormResponseMessage($scope.content.form);
                 $scope.content.action = "standBy";
                 $scope.content.standByText = "Response sent";
             };
 
-            self.sendResponseMessage = function (form) {
+            self.pressJoystick = function (direction) {
+                var message = {
+                    joystick: direction
+                };
+                DataService.send(JSON.stringify(message));
+            };
+
+            self.sendFormResponseMessage = function (form) {
                 var values = {};
                 _.each(form.fields, function (field) {
                     values[field.name] = field.value;
                 });
                 var message = {
-                    body: {
+                    form: {
                         id: form.id,
                         values: values
                     }

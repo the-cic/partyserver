@@ -30,7 +30,7 @@
                     </div>
                     <span ng-click="onClickSendForm()" class="Button disable-select">Send</span>
                 </div>
-                <div>
+                <div ng-show="false">
                     Asset library:
                     <div ng-repeat="(name, asset) in content.assets">
                         <span>{{name}} : </span>
@@ -48,6 +48,51 @@
                     </div>
                 </div>
 
+            </div>
+
+            <div class="JoystickContainer" ng-show="content.joystick">
+                <div class="Joystick">
+                    <div class="Direction North West" ng-show="content.joystick.nw">
+                        <div class="Button disable-select" ng-click="onPressJoystick('nw')">
+                            <div class="Label">UP LEFT</div>
+                        </div>
+                    </div>
+                    <div class="Direction North Center" ng-show="content.joystick.n">
+                        <div class="Button disable-select" ng-click="onPressJoystick('n')">
+                            <div class="Label">UP</div>
+                        </div>
+                    </div>
+                    <div class="Direction North East" ng-show="content.joystick.ne">
+                        <div class="Button disable-select" ng-click="onPressJoystick('ne')">
+                            <div class="Label">UP RIGHT</div>
+                        </div>
+                    </div>
+                    <div class="Direction West Middle" ng-show="content.joystick.w">
+                        <div class="Button disable-select" ng-click="onPressJoystick('w')">
+                            <div class="Label">LEFT</div>
+                        </div>
+                    </div>
+                    <div class="Direction East Middle" ng-show="content.joystick.e">
+                        <div class="Button disable-select" ng-click="onPressJoystick('e')">
+                            <div class="Label">RIGHT</div>
+                        </div>
+                    </div>
+                    <div class="Direction South West" ng-show="content.joystick.sw">
+                        <div class="Button disable-select" ng-click="onPressJoystick('sw')">
+                            <div class="Label">DOWN LEFT</div>
+                        </div>
+                    </div>
+                    <div class="Direction South Center" ng-show="content.joystick.s">
+                        <div class="Button disable-select" ng-click="onPressJoystick('s')">
+                            <div class="Label">DOWN</div>
+                        </div>
+                    </div>
+                    <div class="Direction South East" ng-show="content.joystick.se">
+                        <div class="Button disable-select" ng-click="onPressJoystick('se')">
+                            <div class="Label">DOWN RIGHT</div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div ng-include="'view/log.html'" ></div>

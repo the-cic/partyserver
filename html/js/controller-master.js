@@ -21,6 +21,10 @@ angular.module('clientApp')
                 self.sendViewBox();
             };
 
+            $scope.onClickSendShowJoystick = function (directions) {
+                self.sendShowJoystick(directions);
+            };
+
             self.onClickConnect = function () {
                 self.name = $scope.login.nameInput;
                 self.token = $scope.login.tokenInput;
@@ -49,6 +53,11 @@ angular.module('clientApp')
                         var userIndex = $scope.users.indexOf(message.body.name);
                         if (userIndex > -1) {
                             $scope.users.splice(userIndex, 1);
+                        }
+                        break;
+                    case "userResponse":
+                        if (message.body.joystick) {
+                            self.move(message.body.joystick);
                         }
                         break;
                 }
@@ -123,8 +132,8 @@ angular.module('clientApp')
                             },
                             {
                                 id: 'blob',
-                                x: 50 + Math.random() * 40,
-                                y: 15 + Math.random() * 30,
+                                x: self.position.x,
+                                y: self.position.y,
                                 width: 20
                             },
                             {
@@ -139,9 +148,59 @@ angular.module('clientApp')
                 DataService.send(JSON.stringify(message));
             };
 
+            self.sendShowJoystick = function (directions) {
+                var message = {
+                    to: $scope.users,
+                    body: {
+                        action: directions > 0 ? "showJoystick" : "hideJoystick",
+                        directions: directions
+                    }
+                };
+                DataService.send(JSON.stringify(message));
+            };
+
             ConnectController($scope, self);
 
             self.assets = {};
+            self.position = {
+                x: 50,
+                y: 15
+            };
+
+            self.move = function (direction) {
+                var offset = 5;
+                switch (direction) {
+                    case 'nw':
+                        self.position.x -= offset;
+                        self.position.y -= offset;
+                        break;
+                    case 'n':
+                        self.position.y -= offset;
+                        break;
+                    case 'ne':
+                        self.position.x += offset;
+                        self.position.y -= offset;
+                        break;
+                    case 'w':
+                        self.position.x -= offset;
+                        break;
+                    case 'e':
+                        self.position.x += offset;
+                        break;
+                    case 'sw':
+                        self.position.x -= offset;
+                        self.position.y += offset;
+                        break;
+                    case 's':
+                        self.position.y += offset;
+                        break;
+                    case 'se':
+                        self.position.x += offset;
+                        self.position.y += offset;
+                        break;
+                }
+                self.sendViewBox();
+            };
 
             self.loadAsset = function (assetName, assetUrl) {
                 $http.get(assetUrl, {responseType: 'blob'}).then(function (data) {

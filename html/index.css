@@ -98,11 +98,66 @@ body {
     height: auto;
 }
 .ViewBox .Sprite {
-  position: absolute;
-/*  top: 25%;
-  left: 60%;
-  width: 20%;*/
-  height: auto;
+    position: absolute;
+    /*  top: 25%;
+      left: 60%;
+      width: 20%;*/
+    height: auto;
 }
 
+.JoystickContainer {
+    max-width: 300px;
+    position: relative;    
+}
 
+.Joystick {
+    width: 100%;
+    padding-top: 100%;
+}
+
+.Joystick .Direction {
+    width: 33.33%;
+    position: absolute;
+}
+
+.Joystick .Center {
+    left: 33.33%;
+}
+
+.Joystick .Middle {
+    top: 33.33%;
+}
+
+.Joystick .North {
+    top: 0;
+}
+
+.Joystick .West {
+    left: 0%;
+}
+
+.Joystick .East {
+    left: 66.67%;
+}
+
+.Joystick .South {
+    top: 66.67%;
+}
+
+.Joystick .Button {
+    width: 100%;
+    padding-top: 100%;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    margin: 0;
+    position: relative;
+}
+
+.Joystick .Button .Label {
+    width: 100%;
+    text-align: center;
+    position: absolute;
+    top: 0;
+    padding-top: 50%;
+}
