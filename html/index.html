@@ -30,6 +30,13 @@
                     </div>
                     <span ng-click="onClickSendForm()" class="Button disable-select">Send</span>
                 </div>
+                <div>
+                    Asset library:
+                    <div ng-repeat="(name, content) in content.assets">
+                        <span>{{name}} : </span>
+                        <img ng-src="{{content}}" />
+                    </div>
+                </div>
 
             </div>
 

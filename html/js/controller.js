@@ -5,12 +5,13 @@ angular.module('clientApp')
             var self = this;
 
             $scope.login = {
-                nameInput : "name" + Math.round(Math.random() * 100),
-                roomInput : "room1"
+                nameInput: "name" + Math.round(Math.random() * 100),
+                roomInput: "room1"
             };
-            
+
             $scope.content = {
-                action: ""
+                action: "",
+                assets: {}
             };
 
             $scope.onClickSendForm = function () {
@@ -50,11 +51,18 @@ angular.module('clientApp')
                     case "showForm":
                         $scope.content.form = message.body.form;
                         break;
+                    case "storeAssets":
+                        message.body.assets;
+                        _.each(message.body.assets, function (value, key) {
+                            $scope.content.assets[key] = value;
+                        });
+                        break;
                 }
             };
 
             self.onSocketClose = function () {
                 $scope.content.action = "";
+                $scope.content.assets = {};
             };
 
             self.sendForm = function () {
@@ -78,6 +86,6 @@ angular.module('clientApp')
             };
 
             ConnectController($scope, self);
-            
+
         });
 

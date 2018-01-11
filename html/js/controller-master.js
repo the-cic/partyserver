@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('clientApp')
-        .controller('MasterController', function ($scope, DataService, ConnectController) {
+        .controller('MasterController', function ($scope, $http, DataService, ConnectController) {
             var self = this;
 
             $scope.login = {
@@ -11,6 +11,10 @@ angular.module('clientApp')
 
             $scope.onClickTestSend = function () {
                 self.sendTestForm();
+            };
+
+            $scope.onClickSendAssets = function () {
+                self.sendAssets();
             };
 
             self.onClickConnect = function () {
@@ -88,7 +92,36 @@ angular.module('clientApp')
                 DataService.send(JSON.stringify(message));
             };
 
+            self.sendAssets = function () {
+                var message = {
+                    to: $scope.users,
+                    body: {
+                        action: "storeAssets",
+                        assets: {
+                            blob: self.assets.blob,
+                            docking: self.assets.docking
+                        }
+                    }
+                };
+                DataService.send(JSON.stringify(message));
+            };
+
             ConnectController($scope, self);
+
+            self.assets = {};
+
+            self.loadAsset = function (assetName, assetUrl) {
+                $http.get(assetUrl, {responseType: 'blob'}).then(function (data) {
+                    var reader = new FileReader();
+                    reader.onloadend = function (e) {
+                        self.assets[assetName] = e.target.result;
+                    };
+                    reader.readAsDataURL(data.data);
+                });
+            };
+
+            self.loadAsset('blob', 'img/blob.jpg');
+            self.loadAsset('docking', 'img/docking.png');
 
         });
 
