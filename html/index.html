@@ -41,7 +41,7 @@
                 <div class="ViewBoxContainer" ng-if="content.viewBox">
                     <div class="ViewBox">
                         <img ng-repeat="item in content.viewBox"
-                             ng-src="{{content.assets[item.id]}}"
+                             ng-src="{{content.assets[item.shape]}}"
                              ng-class="item.class"
                              ng-style="item.style"
                              />

@@ -61,20 +61,42 @@ angular.module('clientApp')
                         });
                         break;
                     case "showViewBox":
-                        var viewBox = [];
+                        self.viewBox.list = [];
+                        self.viewBox.items = {};
+                        var index = 0;
                         _.each(message.body.items, function (item) {
+                            var isSprite = !item.background;
                             var viewItem = {
                                 id: item.id,
-                                class: item.background ? 'Background' : 'Sprite',
-                                style: item.background ? {} : {
+                                index: index,
+                                shape: item.shape,
+                                sprite: isSprite,
+                                class: isSprite ? 'Sprite' : 'Background',
+                                style: isSprite ? {
                                     left: item.x + '%',
                                     top: item.y + '%',
                                     width: item.width + '%'
-                                }
+                                } : {}
                             };
-                            viewBox.push(viewItem);
+                            self.viewBox.list.push(viewItem);
+                            self.viewBox.items[viewItem.id] = viewItem;
+                            index++;
                         });
-                        $scope.content.viewBox = viewBox;
+                        $scope.content.viewBox = self.viewBox.list;
+                        break;
+                    case "updateViewBox":
+                        _.each(message.body.items, function (item) {
+                            var viewItem = self.viewBox.items[item.id];
+                            if (viewItem && viewItem.sprite) {
+                                viewItem.style = {
+                                    left: item.x + '%',
+                                    top: item.y + '%',
+                                    width: viewItem.style.width
+                                };
+                            }
+                            self.viewBox.list[viewItem.index] = viewItem;
+                        });
+                        $scope.content.viewBox = self.viewBox.list;
                         break;
                     case "showJoystick":
                         $scope.content.joystick = {
@@ -91,8 +113,16 @@ angular.module('clientApp')
             self.onSocketClose = function () {
                 $scope.content.action = "";
                 $scope.content.assets = {};
-                $scope.content.viewBox = false;
                 $scope.content.joystick = false;
+                self.clearViewBox();
+            };
+
+            self.clearViewBox = function () {
+                self.viewBox = {
+                    list: [],
+                    items: {}
+                };
+                $scope.content.viewBox = false;
             };
 
             self.sendForm = function () {
@@ -121,6 +151,8 @@ angular.module('clientApp')
                 };
                 DataService.send(JSON.stringify(message));
             };
+
+            self.clearViewBox();
 
             ConnectController($scope, self);
 

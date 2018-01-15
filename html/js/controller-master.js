@@ -128,19 +128,46 @@ angular.module('clientApp')
                         items: [
                             {
                                 id: 'landscape',
+                                shape: 'landscape',
                                 background: true
                             },
                             {
                                 id: 'blob',
+                                shape: 'blob',
                                 x: self.position.x,
                                 y: self.position.y,
                                 width: 20
                             },
                             {
                                 id: 'docking',
+                                shape: 'docking',
                                 x: 10 + Math.random() * 20,
                                 y: 55 + Math.random() * 10,
                                 width: 5
+                            },
+                            {
+                                id: 'docking2',
+                                shape: 'docking',
+                                x: 20 + Math.random() * 20,
+                                y: 55 + Math.random() * 10,
+                                width: 5
+                            }
+                        ]
+                    }
+                };
+                DataService.send(JSON.stringify(message));
+            };
+
+            self.sendViewBoxUpdate = function () {
+                var message = {
+                    to: $scope.users,
+                    body: {
+                        action: "updateViewBox",
+                        items: [
+                            {
+                                id: 'blob',
+                                x: self.position.x,
+                                y: self.position.y
                             }
                         ]
                     }
@@ -199,7 +226,7 @@ angular.module('clientApp')
                         self.position.y += offset;
                         break;
                 }
-                self.sendViewBox();
+                self.sendViewBoxUpdate();
             };
 
             self.loadAsset = function (assetName, assetUrl) {
