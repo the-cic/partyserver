@@ -14,9 +14,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class LoginMessage {
     public String login;
     
+    // Guest
     @JsonProperty(required = false)
     public String room;
     
+    // Owner
     @JsonProperty(required = false)
     public String token;
 }
