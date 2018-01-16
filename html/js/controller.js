@@ -111,6 +111,8 @@ angular.module('clientApp')
             };
 
             self.onSocketClose = function () {
+                $scope.content.standByText = false;
+                $scope.content.form = false;
                 $scope.content.action = "";
                 $scope.content.assets = {};
                 $scope.content.joystick = false;

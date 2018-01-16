@@ -107,10 +107,12 @@ angular.module('clientApp')
 
             controller.onSocketMessage = function (message) {
                 controller.log(JSON.stringify(message));
-                if (message.error) {
-                    $scope.connectionError = message.error;
-                }
                 switch (message.subject) {
+                    case "error":
+                        if (message.body) {
+                            $scope.connectionError = message.body.errorDescription;
+                        }
+                        break;
                     case "loginAccepted":
                         $scope.loggedIn = true;
                         break;

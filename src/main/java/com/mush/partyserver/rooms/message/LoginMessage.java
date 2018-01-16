@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mush.partyserver.rooms;
+package com.mush.partyserver.rooms.message;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

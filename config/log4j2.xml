@@ -6,7 +6,7 @@
         </Console>
 
         <RollingFile name="RollingFile"
-                     fileName="./log/media-upload-tool.log"
+                     fileName="./log/partyserver.log"
                      filePattern="./log/log-%d{MM-dd-yyyy}-%i.log.gz">
 
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %msg - %logger{36}%n"/>

@@ -3,20 +3,21 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mush.partyserver.rooms;
+package com.mush.partyserver.rooms.message;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 
 /**
- * 
+ * Message from the owner to the server for delivery to guests.
+ *
  * @author cic
  */
 @JsonIgnoreProperties(ignoreUnknown = false)
-public class ContentMessage {
-    
-    public String subject;
-    
-    public Map<String, Object> body;
+public class OwnerMessage extends ContentMessage {
+
+    @JsonProperty(value = "to")
+    public List<String> recipients;
 
 }

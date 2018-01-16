@@ -5,6 +5,10 @@
  */
 package com.mush.partyserver.rooms;
 
+import com.mush.partyserver.rooms.message.OwnerMessage;
+import com.mush.partyserver.rooms.message.ContentMessage;
+import com.mush.partyserver.rooms.message.GuestMessage;
+import com.mush.partyserver.rooms.message.LoginMessage;
 import com.mush.partyserver.rooms.exceptions.RoomsException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,16 +27,6 @@ import org.apache.logging.log4j.Logger;
  * @author cic
  */
 public class GuestHandler {
-
-    private static final String SUBJECT_LOGIN_ACCEPTED = "loginAccepted";
-    private static final String SUBJECT_ROOM_CREATED = "roomCreated";
-    private static final String SUBJECT_USER_CONNECTED = "userConnected";
-    private static final String SUBJECT_USER_DISCONNECTED = "userDisconnected";
-    private static final String SUBJECT_COMMAND = "command";
-    private static final String SUBJECT_USER_RESPONSE = "userResponse";
-
-    private static final String BODY_ROOM_NAME = "name";
-    private static final String BODY_GUEST_NAME = "name";
 
     private final Logger logger;
     private final Rooms rooms;
@@ -101,7 +95,7 @@ public class GuestHandler {
 
             } catch (IOException | RoomsException ex) {
                 logger.info("Message from {} failed : {}", guest, ex.getMessage());
-                guest.send(jsonForException(ex));
+                sendException(guest, ex);
             }
         }
     }
@@ -163,7 +157,7 @@ public class GuestHandler {
 
         } catch (IOException | RoomsException ex) {
             logger.info("Guest {} failed to login: {}", guest, ex.getMessage());
-            guest.send(jsonForException(ex));
+            sendException(guest, ex);
 
             logger.info("Kicking guest: " + guest);
             guest.kick("Login failed");
@@ -181,10 +175,10 @@ public class GuestHandler {
     private void processOwnerMessage(String messageString, Guest owner) throws IOException, RoomsException {
         ObjectMapper mapper = new ObjectMapper();
 
-        OwnerToGuestsContentMessage inputMessage = mapper.readValue(messageString, OwnerToGuestsContentMessage.class);
+        OwnerMessage inputMessage = mapper.readValue(messageString, OwnerMessage.class);
         ContentMessage outputMessage = new ContentMessage();
 
-        outputMessage.subject = SUBJECT_COMMAND;
+        outputMessage.subject = ContentMessage.SUBJECT_COMMAND;
         outputMessage.body = inputMessage.body;
 
         String outputString = jsonForObject(outputMessage);
@@ -206,21 +200,14 @@ public class GuestHandler {
     private void processGuestMessage(String messageString, Guest guest) throws IOException, RoomsException {
         ObjectMapper mapper = new ObjectMapper();
 
-        GuestToOwnerContentMessage message = new GuestToOwnerContentMessage();
+        GuestMessage message = new GuestMessage();
 
         message.from = guest.getLoginName();
-        message.subject = SUBJECT_USER_RESPONSE;
+        message.subject = ContentMessage.SUBJECT_USER_RESPONSE;
         message.body = mapper.readValue(messageString, Map.class);
 
         Guest owner = rooms.getRoomOwner(guest.getRoom());
         owner.send(jsonForObject(message));
-    }
-
-    private String jsonForException(Exception ex) {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("error", ex.getClass().getSimpleName());
-        map.put("errorDescription", ex.getMessage());
-        return jsonForObject(map);
     }
 
     private String jsonForObject(Object object) {
@@ -233,27 +220,34 @@ public class GuestHandler {
         }
         return json;
     }
+    
+    private void sendException(Guest guest, Exception ex) {
+        HashMap<String, Object> body = new HashMap<>();
+        body.put(ContentMessage.BODY_ERROR, ex.getClass().getSimpleName());
+        body.put(ContentMessage.BODY_ERROR_DESCRIPTION, ex.getMessage());
+        sendMessageToGuest(guest, ContentMessage.SUBJECT_ERROR, body);        
+    }
 
     private void sendNewRoom(Guest owner) {
         HashMap<String, Object> body = new HashMap<>();
-        body.put(BODY_ROOM_NAME, owner.getRoom());
-        sendMessageToGuest(owner, SUBJECT_ROOM_CREATED, body);
+        body.put(ContentMessage.BODY_ROOM_NAME, owner.getRoom());
+        sendMessageToGuest(owner, ContentMessage.SUBJECT_ROOM_CREATED, body);
     }
 
     private void sendGuestConnected(Guest owner, Guest guest) {
         HashMap<String, Object> body = new HashMap<>();
-        body.put(BODY_GUEST_NAME, guest.getLoginName());
-        sendMessageToGuest(owner, SUBJECT_USER_CONNECTED, body);
+        body.put(ContentMessage.BODY_GUEST_NAME, guest.getLoginName());
+        sendMessageToGuest(owner, ContentMessage.SUBJECT_USER_CONNECTED, body);
     }
 
     private void sendGuestLoginAccepted(Guest guest) {
-        sendMessageToGuest(guest, SUBJECT_LOGIN_ACCEPTED, null);
+        sendMessageToGuest(guest, ContentMessage.SUBJECT_LOGIN_ACCEPTED, null);
     }
 
     private void sendGuestDisonnected(Guest owner, Guest guest) {
         HashMap<String, Object> body = new HashMap<>();
-        body.put(BODY_GUEST_NAME, guest.getLoginName());
-        sendMessageToGuest(owner, SUBJECT_USER_DISCONNECTED, body);
+        body.put(ContentMessage.BODY_GUEST_NAME, guest.getLoginName());
+        sendMessageToGuest(owner, ContentMessage.SUBJECT_USER_DISCONNECTED, body);
     }
 
     private void sendMessageToGuest(Guest guest, String subject, HashMap<String, Object> body) {
