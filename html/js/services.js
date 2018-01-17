@@ -3,7 +3,26 @@
 angular.module('clientApp')
         .factory('ConfigService', function ($http) {
             var service = {
-                config: false
+                config: false,
+                hostIndex: 0,
+                getPort: function () {
+                    return service.config.port;
+                },
+                resetHosts: function () {
+                    console.log('reset hosts');
+                    service.hostIndex = 0;
+                },
+                getNextHost: function () {
+                    var host = false;
+                    if (service.hasNextHost()) {
+                        host = service.config.hosts[service.hostIndex];
+                        service.hostIndex++;
+                    }
+                    return host;
+                },
+                hasNextHost: function () {
+                    return service.config.hosts.length > service.hostIndex;
+                }
             };
 
             console.log("Loading config");
@@ -15,7 +34,7 @@ angular.module('clientApp')
 
             return service;
         })
-        .factory('DataService', function (ConfigService) {
+        .factory('DataService', function (ConfigService, $timeout) {
             var service = {
                 listener: null
             };
@@ -23,6 +42,21 @@ angular.module('clientApp')
             var connected = false;
             var connecting = false;
             var socket = false;
+            var timeoutPromise = false;
+            var reconnect = false;
+
+            var onConnectionTimeout = function () {
+                console.log('Connection timed out');
+                if (socket) {
+                    reconnect = ConfigService.hasNextHost();
+                    console.log('Closing socket');
+                    socket.close();
+                }
+            };
+
+            service.canReconnect = function () {
+                return reconnect;
+            };
 
             service.connect = function () {
                 if (!ConfigService.config) {
@@ -31,41 +65,49 @@ angular.module('clientApp')
                 if (connected || connecting) {
                     return false;
                 }
-                connecting = true;
 
-                var hosts = ConfigService.config.hosts;
-                var port = ConfigService.config.port;
-                for (var i in hosts) {
-                    var path = 'ws://' + hosts[i] + ':' + port;
-                    console.log('Connecting to ' + path);
-                    try {
-                        socket = new WebSocket(path);
-                        break;
-                    } catch (e) {
-                        console.error('===> WebSocket creation error :: ', e);
-                    }
+                service.listener.onSocketConnecting();
+                connecting = true;
+                reconnect = false;
+                timeoutPromise = false;
+
+                var host = ConfigService.getNextHost();
+                var port = ConfigService.getPort();
+                var timeout = ConfigService.config.timeout;
+
+                var path = 'ws://' + host + ':' + port;
+                console.log('Connecting to ' + path);
+                try {
+                    timeoutPromise = $timeout(onConnectionTimeout, timeout, false);
+                    socket = new WebSocket(path);
+                } catch (e) {
+                    console.error('===> WebSocket creation error :: ', e);
                 }
 
-                socket.onopen = function () {
+                socket.addEventListener('open', function () {
+                    console.log('Cancelling connection timeout');
+                    $timeout.cancel(timeoutPromise);
                     connected = true;
                     connecting = false;
                     console.log('Connected');
                     service.listener.onSocketOpen();
-                };
+                });
 
-                socket.onclose = function (message) {
+                socket.addEventListener('close', function (message) {
                     connected = false;
                     connecting = false;
                     socket = false;
                     console.log('Connection closed');
                     service.listener.onSocketClose(message.reason);
-                };
+                });
 
-                socket.onmessage = function (message) {
+                socket.addEventListener('message', function (message) {
                     service.listener.onSocketMessage(JSON.parse(message.data));
-                };
+                });
 
-                return true;
+                socket.addEventListener('error', function (error) {
+                    console.log(error);
+                });
             };
 
             service.send = function (message) {
@@ -80,7 +122,7 @@ angular.module('clientApp')
 
             return service;
         })
-        .factory('ConnectController', function (DataService) {
+        .factory('ConnectController', function (DataService, ConfigService) {
             var $scope;
             var delegate;
             var controller = {
@@ -89,11 +131,14 @@ angular.module('clientApp')
 
             controller.onClickConnect = function () {
                 delegate.onClickConnect();
+                ConfigService.resetHosts();
+                DataService.connect();
+            };
+
+            controller.onSocketConnecting = function () {
                 $scope.disconnected = false;
                 $scope.connectionError = false;
-                if (DataService.connect()) {
-                    $scope.connectionStatus = "Connecting...";
-                }
+                $scope.connectionStatus = "Connecting...";
             };
 
             controller.onSocketOpen = function () {
@@ -127,6 +172,9 @@ angular.module('clientApp')
                 $scope.connectionStatus = "Disconnected";
                 controller.log("Disconnected : " + reason);
                 delegate.onSocketClose();
+                if (DataService.canReconnect()) {
+                    DataService.connect();
+                }
                 $scope.$apply();
             };
 
