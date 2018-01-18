@@ -47,12 +47,13 @@ angular.module('clientApp')
             };
 
             self.showCommand = function (message) {
-                $scope.content.action = message.body.action;
                 switch (message.body.action) {
                     case "standBy":
+                        $scope.content.action = message.body.action;
                         $scope.content.standByText = message.body.text;
                         break;
                     case "showForm":
+                        $scope.content.action = message.body.action;
                         $scope.content.form = message.body.form;
                         break;
                     case "storeAssets":
@@ -135,6 +136,7 @@ angular.module('clientApp')
 
             self.pressJoystick = function (direction) {
                 var message = {
+                    type: 'joystick',
                     joystick: direction
                 };
                 DataService.send(JSON.stringify(message));
@@ -146,6 +148,7 @@ angular.module('clientApp')
                     values[field.name] = field.value;
                 });
                 var message = {
+                    type: 'form',
                     form: {
                         id: form.id,
                         values: values

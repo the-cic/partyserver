@@ -26,11 +26,11 @@
                     <div>{{content.form.title}}</div>
                     <div ng-repeat="item in content.form.fields">
                         <input type="text" ng-model="item.value" />
-                        <span>{{item.name}}</span>
+                        <span>{{item.label}}</span>
                     </div>
                     <span ng-click="onClickSendForm()" class="Button disable-select">Send</span>
                 </div>
-                <div ng-show="false">
+                <div ng-show="content.assets">
                     Asset library:
                     <div ng-repeat="(name, asset) in content.assets">
                         <span>{{name}} : </span>
