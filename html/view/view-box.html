@@ -1,0 +1,9 @@
+<div class="ViewBoxContainer" >
+    <div class="ViewBox">
+        <img ng-repeat="item in content.viewBox"
+             ng-src="{{content.assets[item.shape]}}"
+             ng-class="item.class"
+             ng-style="item.style"
+             />
+    </div>
+</div>

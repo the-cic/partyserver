@@ -144,6 +144,10 @@ body {
     top: 66.67%;
 }
 
+.InputDisabled .Joystick .Button {
+    background-color: #888888;
+}
+
 .Joystick .Button {
     width: 100%;
     padding-top: 100%;
@@ -152,6 +156,7 @@ body {
     padding-bottom: 0;
     margin: 0;
     position: relative;
+    border-radius: 10px;
 }
 
 .Joystick .Button .Label {

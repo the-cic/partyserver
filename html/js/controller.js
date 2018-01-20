@@ -10,8 +10,9 @@ angular.module('clientApp')
             };
 
             $scope.content = {
-                action: "",
-                assets: {}
+                disabled: true,
+                assets: {},
+                showAssets: false
             };
 
             $scope.onClickSendForm = function () {
@@ -35,7 +36,7 @@ angular.module('clientApp')
             };
 
             self.onSocketOpen = function () {
-                $scope.content.action = "standBy";
+                self.clearContent();
             };
 
             self.onSocketMessage = function (message) {
@@ -48,13 +49,15 @@ angular.module('clientApp')
 
             self.showCommand = function (message) {
                 switch (message.body.action) {
+                    case "clearView":
+                        self.clearView();
+                        break;
                     case "standBy":
-                        $scope.content.action = message.body.action;
                         $scope.content.standByText = message.body.text;
                         break;
                     case "showForm":
-                        $scope.content.action = message.body.action;
                         $scope.content.form = message.body.form;
+                        $scope.content.disabled = false;
                         break;
                     case "storeAssets":
                         _.each(message.body.assets, function (value, key) {
@@ -104,6 +107,7 @@ angular.module('clientApp')
                             '4': {n: 1, s: 1, e: 1, w: 1},
                             '8': {nw: 1, n: 1, ne: 1, w: 1, e: 1, sw: 1, s: 1, se: 1}
                         }[message.body.directions];
+                        $scope.content.disabled = false;
                         break;
                     case "hideJoystick":
                         $scope.content.joystick = false;
@@ -112,9 +116,19 @@ angular.module('clientApp')
             };
 
             self.onSocketClose = function () {
+                self.clearContent();
+            };
+
+            self.clearView = function () {
                 $scope.content.standByText = false;
                 $scope.content.form = false;
-                $scope.content.action = "";
+                $scope.content.joystick = false;
+                $scope.content.viewBox = false;
+            };
+
+            self.clearContent = function () {
+                $scope.content.standByText = false;
+                $scope.content.form = false;
                 $scope.content.assets = {};
                 $scope.content.joystick = false;
                 self.clearViewBox();
@@ -129,12 +143,19 @@ angular.module('clientApp')
             };
 
             self.sendForm = function () {
+                if ($scope.content.disabled) {
+                    return;
+                }
+                $scope.content.disabled = true;
                 self.sendFormResponseMessage($scope.content.form);
-                $scope.content.action = "standBy";
-                $scope.content.standByText = "Response sent";
+                $scope.content.form = false;
             };
 
             self.pressJoystick = function (dx, dy) {
+                if ($scope.content.disabled) {
+                    return;
+                }
+                $scope.content.disabled = true;
                 var message = {
                     type: 'joystick',
                     joystick: [dx, dy]
