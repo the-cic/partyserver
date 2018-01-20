@@ -18,8 +18,8 @@ angular.module('clientApp')
                 self.sendForm();
             };
 
-            $scope.onPressJoystick = function (direction) {
-                self.pressJoystick(direction);
+            $scope.onPressJoystick = function (dx, dy) {
+                self.pressJoystick(dx, dy);
             };
 
             self.onClickConnect = function () {
@@ -134,10 +134,10 @@ angular.module('clientApp')
                 $scope.content.standByText = "Response sent";
             };
 
-            self.pressJoystick = function (direction) {
+            self.pressJoystick = function (dx, dy) {
                 var message = {
                     type: 'joystick',
-                    joystick: direction
+                    joystick: [dx, dy]
                 };
                 DataService.send(JSON.stringify(message));
             };

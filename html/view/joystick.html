@@ -1,0 +1,44 @@
+<div class="JoystickContainer" >
+    <div class="Joystick">
+        <div class="Direction North West" ng-show="content.joystick.nw">
+            <div class="Button disable-select" ng-click="onPressJoystick(-1, -1)">
+                <div class="Label">UP LEFT</div>
+            </div>
+        </div>
+        <div class="Direction North Center" ng-show="content.joystick.n">
+            <div class="Button disable-select" ng-click="onPressJoystick(0, -1)">
+                <div class="Label">UP</div>
+            </div>
+        </div>
+        <div class="Direction North East" ng-show="content.joystick.ne">
+            <div class="Button disable-select" ng-click="onPressJoystick(1, -1)">
+                <div class="Label">UP RIGHT</div>
+            </div>
+        </div>
+        <div class="Direction West Middle" ng-show="content.joystick.w">
+            <div class="Button disable-select" ng-click="onPressJoystick(-1, 0)">
+                <div class="Label">LEFT</div>
+            </div>
+        </div>
+        <div class="Direction East Middle" ng-show="content.joystick.e">
+            <div class="Button disable-select" ng-click="onPressJoystick(1, 0)">
+                <div class="Label">RIGHT</div>
+            </div>
+        </div>
+        <div class="Direction South West" ng-show="content.joystick.sw">
+            <div class="Button disable-select" ng-click="onPressJoystick(-1, 1)">
+                <div class="Label">DOWN LEFT</div>
+            </div>
+        </div>
+        <div class="Direction South Center" ng-show="content.joystick.s">
+            <div class="Button disable-select" ng-click="onPressJoystick(0, 1)">
+                <div class="Label">DOWN</div>
+            </div>
+        </div>
+        <div class="Direction South East" ng-show="content.joystick.se">
+            <div class="Button disable-select" ng-click="onPressJoystick(1, 1)">
+                <div class="Label">DOWN RIGHT</div>
+            </div>
+        </div>
+    </div>
+</div>
