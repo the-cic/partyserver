@@ -1,27 +1,29 @@
+<div class="ConnectionStatus">
+    <span>Connection status:</span>
+    <span>{{connectionStatus}}</span>
+</div>
+
+<div class="Separator Thick"></div>
+
 <div class="Connection">
-    <div>
-        <span>Connection status:</span>
-        <span>{{connectionStatus}}</span>
-    </div>
 
-    <div class="Separator Thick"></div>
-
-    <div ng-show="disconnected" >
+    <div ng-show="disconnected" class="Form">
+        <div class="Title">Enter room name and player handle</div>
         <div>
-            <input type="text" ng-model="login.roomInput"/>
-            <span>Room</span>
-            <br/>
+            <div class="Label">Room</div>
+            <input type="text" ng-model="login.roomInput" class="TextInput"/>
         </div>
         <div>
-            <input type="text" ng-model="login.nameInput"/>
-            <span>Name</span>
+            <div class="Label">Player</div>
+            <input type="text" ng-model="login.nameInput" class="TextInput"/>
         </div>
 
-        <div class="Separator Thick"></div>
+        <div class="Label">&nbsp;</div>
+        <div ng-click="onClickConnect()" class="Button disable-select">Connect</div>
 
-        <div>
-            <span ng-click="onClickConnect()" class="Button disable-select">Connect</span>
-            <span ng-show="connectionError">{{connectionError}}</span>
+        <div ng-show="connectionError">
+            <div class="Label">&nbsp;</div>
+            <div class="Message">{{connectionError}}</div>
         </div>
     </div>
 </div>

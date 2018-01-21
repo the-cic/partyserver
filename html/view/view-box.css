@@ -1,0 +1,38 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 21-Jan-2018, 02:38:45
+    Author     : cic
+*/
+
+.ViewBoxContainer {
+    max-width: 1024px;
+}
+.ViewBox {
+    position: relative;
+    overflow: hidden;
+}
+.ViewBox img {
+    display: block;
+    image-rendering: optimizeSpeed;             /* STOP SMOOTHING, GIVE ME SPEED  */
+    image-rendering: -moz-crisp-edges;          /* Firefox                        */
+    image-rendering: -o-crisp-edges;            /* Opera                          */
+    image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+    image-rendering: pixelated; /* Chrome */
+    image-rendering: optimize-contrast;         /* CSS3 Proposed                  */
+    -ms-interpolation-mode: nearest-neighbor;   /* IE8+                           */
+}
+.ViewBox .Background {
+    width: 100%;
+    height: auto;
+}
+.ViewBox .Sprite {
+    position: absolute;
+    /*  top: 25%;
+      left: 60%;
+      width: 20%;*/
+    height: auto;
+}

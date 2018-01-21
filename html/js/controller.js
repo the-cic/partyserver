@@ -6,7 +6,7 @@ angular.module('clientApp')
 
             $scope.login = {
                 nameInput: "name" + Math.round(Math.random() * 100),
-                roomInput: "room1"
+                roomInput: ""
             };
 
             $scope.content = {
@@ -104,7 +104,7 @@ angular.module('clientApp')
                         break;
                     case "showJoystick":
                         $scope.content.joystick = {
-                            '4': {n: 1, s: 1, e: 1, w: 1},
+                            '4': {nw: 1, n: 1, ne: 1, w: 1, e: 1, sw: 1, s: 1, se: 1},
                             '8': {nw: 1, n: 1, ne: 1, w: 1, e: 1, sw: 1, s: 1, se: 1}
                         }[message.body.directions];
                         $scope.content.disabled = false;

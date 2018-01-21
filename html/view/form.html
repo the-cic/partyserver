@@ -1,8 +1,9 @@
-<div >
-    <div>{{content.form.title}}</div>
+<div class="Form">
+    <div class="Title">{{content.form.title}}</div>
     <div ng-repeat="item in content.form.fields">
-        <input type="text" ng-model="item.value" />
-        <span>{{item.label}}</span>
+        <div class="Label">{{item.label}}</div>
+        <input type="text" ng-model="item.value" class="TextInput"/>
     </div>
-    <span ng-click="onClickSendForm()" class="Button disable-select">Send</span>
+    <div class="Label">&nbsp;</div>
+    <div ng-click="onClickSendForm()" class="Button disable-select">Send</div>
 </div>

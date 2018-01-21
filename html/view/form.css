@@ -1,0 +1,59 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 21-Jan-2018, 02:38:45
+    Author     : cic
+*/
+
+.Form {
+    background-color: #9caebf;
+    border-radius: 20px;
+    padding: 20px;
+    font-family: sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.Form .Title {
+    font-size: 18px;
+    color: #285c82;
+    margin-bottom: 20px;
+}
+
+.Form .TextInput {
+    border-radius: 5px;
+    border: none;
+    background-color: #d4cccd;
+    padding: 5px;
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 20px;
+    color: #a05a27;
+    font-weight: bold;
+}
+
+.Form .Label {
+    font-size: 12px;
+    color: #5c7788;
+}
+
+.Form .Message {
+    font-size: 14px;
+    color: #ca3e12;
+}
+
+.Form .Button {
+    background-color: #a05a27;
+    color: #ce946a;
+    font-size: 20px;
+    padding: 10px 10px 10px 10px;
+    text-align: center;
+    cursor: default;
+    border-radius: 20px;
+/*    margin-top: 10px;
+    margin-bottom: 10px;    */
+}

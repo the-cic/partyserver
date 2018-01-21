@@ -1,7 +1,7 @@
 <!doctype html>
 <html ng-app="clientApp">
     <head>
-        <title>Log</title>
+        <title>Client</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="js/angular.min.js"></script>
@@ -10,6 +10,10 @@
         <script src="js/services.js"></script>
         <script src="js/controller.js"></script>
         <link rel="stylesheet" href="index.css">
+        <link rel="stylesheet" href="view/form.css">
+        <link rel="stylesheet" href="view/joystick.css">
+        <link rel="stylesheet" href="view/view-box.css">
+        <link rel="stylesheet" href="view/log.css">
     </head>
     <body>
         <div ng-controller="ClientController" class="App">
@@ -19,19 +23,13 @@
             <div class="Content" ng-show="loggedIn">
 
                 <div ng-if="content.standByText">
-                    <span ng-show="content.standByText">{{content.standByText}}<br/></span>
-                </div>
-
-                <div ng-show="content.showAssets">
-                    Asset library:
-                    <div ng-repeat="(name, asset) in content.assets">
-                        <span>{{name}} : </span>
-                        <img ng-src="{{asset}}" />
+                    <div ng-show="content.standByText" class="StandBy">
+                        {{content.standByText}}
                     </div>
                 </div>
 
                 <div ng-include="'view/view-box.html'" ng-if="content.viewBox"></div>
-                
+
                 <div ng-class="{'InputDisabled' : content.disabled}">
                     <div ng-include="'view/form.html'" ng-if="content.form"></div>
                     <div ng-include="'view/joystick.html'" ng-show="content.joystick"></div>
@@ -40,6 +38,13 @@
             </div>
 
             <div ng-include="'view/log.html'" ></div>
+            <div ng-show="content.showAssets">
+                Asset library:
+                <div ng-repeat="(name, asset) in content.assets">
+                    <span>{{name}} : </span>
+                    <img ng-src="{{asset}}" />
+                </div>
+            </div>
 
         </div>
     </body>
