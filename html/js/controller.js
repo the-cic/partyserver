@@ -19,6 +19,10 @@ angular.module('clientApp')
                 self.sendForm();
             };
 
+            $scope.onClickSelectChoice = function (value) {
+                self.sendSelectChoice(value);
+            };
+
             $scope.onPressJoystick = function (dx, dy) {
                 self.pressJoystick(dx, dy);
             };
@@ -59,6 +63,10 @@ angular.module('clientApp')
                         $scope.content.form = message.body.form;
                         $scope.content.disabled = false;
                         break;
+                    case "showChoice":
+                        $scope.content.choice = message.body.choice;
+                        $scope.content.disabled = false;
+                        break;
                     case "storeAssets":
                         _.each(message.body.assets, function (value, key) {
                             $scope.content.assets[key] = value;
@@ -91,20 +99,25 @@ angular.module('clientApp')
                     case "updateViewBox":
                         _.each(message.body.items, function (item) {
                             var viewItem = self.viewBox.items[item.id];
-                            if (viewItem && viewItem.sprite) {
-                                viewItem.style = {
-                                    left: item.x + '%',
-                                    top: item.y + '%',
-                                    width: viewItem.style.width
-                                };
+                            if (viewItem) {
+                                if (viewItem.sprite) {
+                                    viewItem.style = {
+                                        left: item.x + '%',
+                                        top: item.y + '%',
+                                        width: viewItem.style.width
+                                    };
+                                }
+                                if (item.shape) {
+                                    viewItem.shape = item.shape;
+                                }
+                                self.viewBox.list[viewItem.index] = viewItem;
                             }
-                            self.viewBox.list[viewItem.index] = viewItem;
                         });
                         $scope.content.viewBox = self.viewBox.list;
                         break;
                     case "showJoystick":
                         $scope.content.joystick = {
-                            '4': {nw: 1, n: 1, ne: 1, w: 1, e: 1, sw: 1, s: 1, se: 1},
+                            '4': {n: 1, w: 1, e: 1, s: 1},
                             '8': {nw: 1, n: 1, ne: 1, w: 1, e: 1, sw: 1, s: 1, se: 1}
                         }[message.body.directions];
                         $scope.content.disabled = false;
@@ -151,6 +164,15 @@ angular.module('clientApp')
                 $scope.content.form = false;
             };
 
+            self.sendSelectChoice = function (value) {
+                if ($scope.content.disabled) {
+                    return;
+                }
+                $scope.content.disabled = true;
+                self.sendChoiceResponseMessage($scope.content.choice, value);
+                $scope.content.choice = false;
+            };
+
             self.pressJoystick = function (dx, dy) {
                 if ($scope.content.disabled) {
                     return;
@@ -173,6 +195,18 @@ angular.module('clientApp')
                     form: {
                         id: form.id,
                         values: values
+                    }
+                };
+                DataService.send(JSON.stringify(message));
+            };
+
+            self.sendChoiceResponseMessage = function (choice, value) {
+                console.log('value:'+value);
+                var message = {
+                    type: 'choice',
+                    choice: {
+                        id: choice.id,
+                        value: value
                     }
                 };
                 DataService.send(JSON.stringify(message));

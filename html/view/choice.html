@@ -1,0 +1,7 @@
+<div class="Form">
+    <div class="Title">{{content.choice.title}}</div>
+    <div ng-repeat="item in content.choice.fields">
+        <div ng-if="!$first" class="Label">&nbsp;</div>
+        <div ng-click="onClickSelectChoice(item.name)" class="Button disable-select">{{item.label}}</div>
+    </div>
+</div>

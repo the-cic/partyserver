@@ -32,6 +32,7 @@
 
                 <div ng-class="{'InputDisabled' : content.disabled}">
                     <div ng-include="'view/form.html'" ng-if="content.form"></div>
+                    <div ng-include="'view/choice.html'" ng-if="content.choice"></div>
                     <div ng-include="'view/joystick.html'" ng-show="content.joystick"></div>
                 </div>
 
