@@ -1,9 +1,19 @@
 <div class="ViewBoxContainer" >
     <div class="ViewBox">
-        <img ng-repeat="item in content.viewBox"
-             ng-src="{{content.assets[item.shape]}}"
-             ng-class="item.class"
-             ng-style="item.style"
-             />
+        <div ng-repeat="item in content.viewBox" >
+            <img 
+                ng-if="item.shape"
+                ng-src="{{content.assets[item.shape]}}"
+                ng-class="item.class"
+                ng-style="item.style"
+                />
+            <div 
+                ng-if="item.text"
+                ng-class="item.class"
+                ng-style="item.style"
+                >
+                {{item.text}}
+            </div>
+        </div>
     </div>
 </div>

@@ -31,8 +31,16 @@ and open the template in the editor.
 }
 .ViewBox .Sprite {
     position: absolute;
-    /*  top: 25%;
-      left: 60%;
-      width: 20%;*/
     height: auto;
+}
+.ViewBox .Label {
+    position: absolute;
+    height: auto;
+    transform: translate(-50%, -50%);
+    color: #FF6F00;
+    text-shadow:
+        -1px -1px 0 #a05a27,
+        1px -1px 0 #a05a27,
+        -1px 1px 0 #a05a27,
+        1px 1px 0 #a05a27;
 }

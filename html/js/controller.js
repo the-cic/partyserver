@@ -1,48 +1,38 @@
 'use strict';
-
 angular.module('clientApp')
         .controller('ClientController', function ($scope, DataService, ConnectController) {
             var self = this;
-
             $scope.login = {
                 nameInput: "name" + Math.round(Math.random() * 100),
                 roomInput: ""
             };
-
             $scope.content = {
                 disabled: true,
                 assets: {},
                 showAssets: false
             };
-
             $scope.onClickSendForm = function () {
                 self.sendForm();
             };
-
             $scope.onClickSelectChoice = function (value) {
                 self.sendSelectChoice(value);
             };
-
             $scope.onPressJoystick = function (dx, dy) {
                 self.pressJoystick(dx, dy);
             };
-
             self.onClickConnect = function () {
                 self.room = $scope.login.roomInput.toUpperCase();
                 self.name = $scope.login.nameInput;
             };
-
             self.getLoginMessage = function () {
                 return {
                     login: self.name,
                     room: self.room
                 };
             };
-
             self.onSocketOpen = function () {
                 self.clearContent();
             };
-
             self.onSocketMessage = function (message) {
                 switch (message.subject) {
                     case "command":
@@ -50,7 +40,6 @@ angular.module('clientApp')
                         break;
                 }
             };
-
             self.showCommand = function (message) {
                 switch (message.body.action) {
                     case "clearView":
@@ -77,18 +66,28 @@ angular.module('clientApp')
                         self.viewBox.items = {};
                         var index = 0;
                         _.each(message.body.items, function (item) {
+                            var isShape = item.shape && true;
                             var isSprite = !item.background;
+                            var isLabel = item.text && true;
                             var viewItem = {
                                 id: item.id,
                                 index: index,
-                                shape: item.shape,
+                                shape: isShape ? item.shape : false,
+                                text: isLabel ? item.text : false,
                                 sprite: isSprite,
-                                class: isSprite ? 'Sprite' : 'Background',
-                                style: isSprite ? {
-                                    left: item.x + '%',
-                                    top: item.y + '%',
-                                    width: item.width + '%'
-                                } : {}
+                                class: isShape
+                                        ? (isSprite ? 'Sprite' : 'Background')
+                                        : (isLabel ? 'Label' : ''),
+                                style: isShape
+                                        ? (isSprite ? {
+                                            left: item.x + '%',
+                                            top: item.y + '%',
+                                            width: item.width + '%'
+                                        } : {})
+                                        : (isLabel ? {
+                                            left: item.x + '%',
+                                            top: item.y + '%',
+                                        } : {})
                             };
                             self.viewBox.list.push(viewItem);
                             self.viewBox.items[viewItem.id] = viewItem;
@@ -100,15 +99,26 @@ angular.module('clientApp')
                         _.each(message.body.items, function (item) {
                             var viewItem = self.viewBox.items[item.id];
                             if (viewItem) {
-                                if (viewItem.sprite) {
+                                if (viewItem.shape) {
+                                    if (viewItem.sprite) {
+                                        viewItem.style = {
+                                            left: item.x + '%',
+                                            top: item.y + '%',
+                                            width: viewItem.style.width
+                                        };
+                                    }
+                                    if (item.shape) {
+                                        viewItem.shape = item.shape;
+                                    }
+                                }
+                                if (viewItem.text) {
                                     viewItem.style = {
                                         left: item.x + '%',
-                                        top: item.y + '%',
-                                        width: viewItem.style.width
+                                        top: item.y + '%'
                                     };
-                                }
-                                if (item.shape) {
-                                    viewItem.shape = item.shape;
+                                    if (item.text) {
+                                        viewItem.text = item.text;
+                                    }
                                 }
                                 self.viewBox.list[viewItem.index] = viewItem;
                             }
@@ -127,18 +137,15 @@ angular.module('clientApp')
                         break;
                 }
             };
-
             self.onSocketClose = function () {
                 self.clearContent();
             };
-
             self.clearView = function () {
                 $scope.content.standByText = false;
                 $scope.content.form = false;
                 $scope.content.joystick = false;
                 $scope.content.viewBox = false;
             };
-
             self.clearContent = function () {
                 $scope.content.standByText = false;
                 $scope.content.form = false;
@@ -146,7 +153,6 @@ angular.module('clientApp')
                 $scope.content.joystick = false;
                 self.clearViewBox();
             };
-
             self.clearViewBox = function () {
                 self.viewBox = {
                     list: [],
@@ -154,7 +160,6 @@ angular.module('clientApp')
                 };
                 $scope.content.viewBox = false;
             };
-
             self.sendForm = function () {
                 if ($scope.content.disabled) {
                     return;
@@ -163,7 +168,6 @@ angular.module('clientApp')
                 self.sendFormResponseMessage($scope.content.form);
                 $scope.content.form = false;
             };
-
             self.sendSelectChoice = function (value) {
                 if ($scope.content.disabled) {
                     return;
@@ -172,7 +176,6 @@ angular.module('clientApp')
                 self.sendChoiceResponseMessage($scope.content.choice, value);
                 $scope.content.choice = false;
             };
-
             self.pressJoystick = function (dx, dy) {
                 if ($scope.content.disabled) {
                     return;
@@ -184,7 +187,6 @@ angular.module('clientApp')
                 };
                 DataService.send(JSON.stringify(message));
             };
-
             self.sendFormResponseMessage = function (form) {
                 var values = {};
                 _.each(form.fields, function (field) {
@@ -199,9 +201,8 @@ angular.module('clientApp')
                 };
                 DataService.send(JSON.stringify(message));
             };
-
             self.sendChoiceResponseMessage = function (choice, value) {
-                console.log('value:'+value);
+                console.log('value:' + value);
                 var message = {
                     type: 'choice',
                     choice: {
@@ -211,10 +212,7 @@ angular.module('clientApp')
                 };
                 DataService.send(JSON.stringify(message));
             };
-
             self.clearViewBox();
-
             ConnectController($scope, self);
-
         });
 
