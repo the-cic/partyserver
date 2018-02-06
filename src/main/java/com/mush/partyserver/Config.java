@@ -120,7 +120,7 @@ public class Config {
 
         SubnodeConfiguration socket = ini.getSection("websocket");
         socketPort = socket.getInt("port");
-        socketSsl = socket.getBoolean("ssl");
+        socketSsl = socket.getBoolean("ssl", false);
         loginTimeoutSeconds = socket.getInt("loginTimeoutSeconds", 10);
         loginTimeoutCheckSeconds = socket.getInt("loginTimeoutCheckSeconds", 60);
 

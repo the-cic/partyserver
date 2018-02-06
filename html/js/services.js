@@ -8,8 +8,11 @@ angular.module('clientApp')
                 getPort: function () {
                     return service.config.port;
                 },
+                getProtocol: function () {
+                    return service.config.protocol;
+                },
                 resetHosts: function () {
-                    console.log('reset hosts');
+                    console.log('Reset hosts index');
                     service.hostIndex = 0;
                 },
                 getNextHost: function () {
@@ -44,13 +47,19 @@ angular.module('clientApp')
             var socket = false;
             var timeoutPromise = false;
             var reconnect = false;
+            var error = false;
 
             var onConnectionTimeout = function () {
                 console.log('Connection timed out');
                 if (socket) {
                     reconnect = ConfigService.hasNextHost();
-                    console.log('Closing socket');
+                    service.listener.onConnectionTimeout();
                     socket.close();
+                } else {
+                    connected = false;
+                    connecting = false;
+                    reconnect = false;
+                    service.listener.onSocketClose(error ? error : '');
                 }
             };
 
@@ -66,48 +75,57 @@ angular.module('clientApp')
                     return false;
                 }
 
-                service.listener.onSocketConnecting();
                 connecting = true;
                 reconnect = false;
                 timeoutPromise = false;
 
+                var protocol = ConfigService.getProtocol();
                 var host = ConfigService.getNextHost();
                 var port = ConfigService.getPort();
                 var timeout = ConfigService.config.timeout;
 
-                var path = 'ws://' + host + ':' + port;
+                var path = protocol + '://' + host + ':' + port;
+
+                service.listener.onSocketConnecting(path);
                 console.log('Connecting to ' + path);
+
                 try {
                     timeoutPromise = $timeout(onConnectionTimeout, timeout, false);
                     socket = new WebSocket(path);
                 } catch (e) {
+                    error = e;
                     console.error('===> WebSocket creation error :: ', e);
+                    $timeout.cancel(timeoutPromise);
+                    reconnect = ConfigService.hasNextHost();
                 }
 
-                socket.addEventListener('open', function () {
-                    console.log('Cancelling connection timeout');
-                    $timeout.cancel(timeoutPromise);
-                    connected = true;
-                    connecting = false;
-                    console.log('Connected');
-                    service.listener.onSocketOpen();
-                });
+                if (socket) {
+                    socket.addEventListener('open', function () {
+                        console.log('Cancelling connection timeout');
+                        $timeout.cancel(timeoutPromise);
+                        connected = true;
+                        connecting = false;
+                        console.log('Connected');
+                        service.listener.onSocketOpen();
+                    });
 
-                socket.addEventListener('close', function (message) {
-                    connected = false;
-                    connecting = false;
-                    socket = false;
-                    console.log('Connection closed');
-                    service.listener.onSocketClose(message.reason);
-                });
+                    socket.addEventListener('close', function (message) {
+                        connected = false;
+                        connecting = false;
+                        socket = false;
+                        console.log('Connection closed');
+                        service.listener.onSocketClose(message.reason);
+                    });
 
-                socket.addEventListener('message', function (message) {
-                    service.listener.onSocketMessage(JSON.parse(message.data));
-                });
+                    socket.addEventListener('message', function (message) {
+                        service.listener.onSocketMessage(JSON.parse(message.data));
+                    });
 
-                socket.addEventListener('error', function (error) {
-                    console.log(error);
-                });
+                    socket.addEventListener('error', function (error) {
+                        console.log(error);
+                        //reconnect = ConfigService.hasNextHost();
+                    });
+                }
             };
 
             service.send = function (message) {
@@ -135,15 +153,20 @@ angular.module('clientApp')
                 DataService.connect();
             };
 
-            controller.onSocketConnecting = function () {
+            controller.onSocketConnecting = function (path) {
                 $scope.disconnected = false;
                 $scope.connectionError = false;
-                $scope.connectionStatus = "Connecting...";
+                $scope.connectionStatus = 'Connecting...';
+                controller.log('Connecting to ' + path + ' ...');
+            };
+
+            controller.onConnectionTimeout = function() {
+                controller.log('Connection timeout');
             };
 
             controller.onSocketOpen = function () {
                 delegate.onSocketOpen();
-                $scope.connectionStatus = "Connected";
+                $scope.connectionStatus = 'Connected';
                 controller.log('Connected');
                 $scope.$apply();
                 var message = delegate.getLoginMessage();
@@ -170,8 +193,10 @@ angular.module('clientApp')
                 $scope.disconnected = true;
                 $scope.loggedIn = false;
                 $scope.connectionStatus = "Disconnected";
-                controller.log("Disconnected : " + reason);
+                console.log("onSocketClose : " + reason);
+                controller.log("Disconnected" + (reason ? ' : ' + reason : ''));
                 delegate.onSocketClose();
+                console.log('DataService.canReconnect():' + DataService.canReconnect());
                 if (DataService.canReconnect()) {
                     DataService.connect();
                 }
