@@ -25,13 +25,30 @@ public class GuestVerification {
         this.config = config0;
     }
 
-    public void verifyToken(String token) throws RoomsException {
+    public void verifyToken(String token, String name) throws RoomsException {
         HashMap<String, String> tokenUsers = config.getTokenUsers();
         if (tokenUsers.containsKey(token)) {
-            logger.info("Token is valid: {}, belongs to {}", token, tokenUsers.get(token));
+            String user = tokenUsers.get(token);
+            if (!user.equals(name)) {
+                logger.info("Invalid user {} for token: {}", user, token);
+                throw new RoomsException("Invalid user for token");
+            }
+            logger.info("Token is valid: {}, belongs to {}", token, user);
         } else {
             logger.info("Invalid token: {}", token);
             throw new RoomsException("Invalid token");
+        }
+    }
+
+    public void verifyPreferredRoomName(String room, String name) throws RoomsException {
+        //[rooms]
+        //TEST = test
+        HashMap<String, String> userRooms = config.getUserRooms();
+        if (userRooms.containsKey(room) && userRooms.get(room).equals(name)) {
+            logger.info("Preferred room {} for user {} ok", room, name);
+        } else {
+            logger.info("Invalid preferred room {} for user {}", room, name);
+            throw new RoomsException("Invalid preferred room for user");
         }
     }
 

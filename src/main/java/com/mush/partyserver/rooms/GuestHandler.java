@@ -45,7 +45,7 @@ public class GuestHandler {
         loginTimeoutThread = new Thread(loginTimeoutChecker);
         loginTimeoutMillis = config.getLoginTimeoutMillis();
     }
-    
+
     public Rooms getRooms() {
         return rooms;
     }
@@ -131,9 +131,15 @@ public class GuestHandler {
             LoginMessage loginMessage = mapper.readValue(message, LoginMessage.class);
 
             if (loginMessage.token != null) {
-                verification.verifyToken(loginMessage.token);
+                verification.verifyToken(loginMessage.token, loginMessage.login);
 
-                String roomName = rooms.createNewRoom(loginMessage.token);
+                String preferredRoomName = null;
+                if (loginMessage.room != null) {
+                    verification.verifyPreferredRoomName(loginMessage.room, loginMessage.login);
+                    preferredRoomName = loginMessage.room;
+                }
+
+                String roomName = rooms.createNewRoom(loginMessage.token, preferredRoomName);
 
                 guest.login(loginMessage.login, roomName, true);
 
@@ -220,12 +226,12 @@ public class GuestHandler {
         }
         return json;
     }
-    
+
     private void sendException(Guest guest, Exception ex) {
         HashMap<String, Object> body = new HashMap<>();
         body.put(ContentMessage.BODY_ERROR, ex.getClass().getSimpleName());
         body.put(ContentMessage.BODY_ERROR_DESCRIPTION, ex.getMessage());
-        sendMessageToGuest(guest, ContentMessage.SUBJECT_ERROR, body);        
+        sendMessageToGuest(guest, ContentMessage.SUBJECT_ERROR, body);
     }
 
     private void sendNewRoom(Guest owner) {

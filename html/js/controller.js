@@ -4,7 +4,7 @@ angular.module('clientApp')
             var self = this;
             $scope.login = {
                 nameInput: "name" + Math.round(Math.random() * 100),
-                roomInput: ""
+                roomInput: "TEST"
             };
             $scope.content = {
                 disabled: true,

@@ -48,6 +48,7 @@ public class Config {
 
     private HashMap<String, String> userTokens;
     private HashMap<String, String> tokenUsers;
+    private HashMap<String, String> userRooms;
 
     public Config() {
         logger = setupLog4j();
@@ -85,6 +86,10 @@ public class Config {
 
     public HashMap<String, String> getTokenUsers() {
         return tokenUsers;
+    }
+
+    public HashMap<String, String> getUserRooms() {
+        return userRooms;
     }
 
     public boolean getSocketSsl() {
@@ -134,6 +139,14 @@ public class Config {
         }
         for (Map.Entry<String, String> e : userTokens.entrySet()) {
             tokenUsers.put(e.getValue(), e.getKey());
+        }
+
+        userRooms = new HashMap<>();
+        SubnodeConfiguration rooms = ini.getSection("rooms");
+        Iterator<String> roomKeys = rooms.getKeys();
+        while (roomKeys.hasNext()) {
+            String key = roomKeys.next();
+            userRooms.put(key, rooms.getString(key));
         }
     }
 

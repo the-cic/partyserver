@@ -40,14 +40,15 @@ public class Rooms {
      * Create new room and return its name
      *
      * @param token
+     * @param preferredRoomName
      * @return
      * @throws com.mush.partyserver.rooms.exceptions.RoomsException
      */
-    public String createNewRoom(String token) throws RoomsException {
+    public String createNewRoom(String token, String preferredRoomName) throws RoomsException {
         if (roomTokens.containsValue(token)) {
             throw new RoomsException("Room for this token is in use");
         }
-        String roomName = newRoomName();
+        String roomName = newRoomName(preferredRoomName);
         rooms.put(roomName, new ConcurrentHashMap<>());
         roomTokens.put(roomName, token);
         logger.info("New room created: {}", roomName);
@@ -148,7 +149,7 @@ public class Rooms {
         if (!roomExists(roomName)) {
             throw new RoomDoesNotExistException(roomName);
         }
-        
+
         Map<String, Guest> room = rooms.get(roomName);
         for (Map.Entry<String, Guest> e : room.entrySet()) {
             Guest guest = e.getValue();
@@ -156,7 +157,7 @@ public class Rooms {
             guest.kick("Room closed");
         }
         room.clear();
-        
+
         rooms.remove(roomName);
         roomTokens.remove(roomName);
         roomOwners.remove(roomName);
@@ -174,12 +175,17 @@ public class Rooms {
         return guest.equals(getRoomOwner(room));
     }
 
-    private String newRoomName() throws RoomsException {
-        int tries = 3;
-        String name = getRandomName();
-        while (tries > 0 && roomExists(name)) {
+    private String newRoomName(String preferredName) throws RoomsException {
+        String name;
+        if (preferredName != null) {
+            name = preferredName;
+        } else {
+            int tries = 3;
             name = getRandomName();
-            tries--;
+            while (tries > 0 && roomExists(name)) {
+                name = getRandomName();
+                tries--;
+            }
         }
         if (roomExists(name)) {
             throw new RoomsException("Could not create unique room name");
